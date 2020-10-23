@@ -1,0 +1,23 @@
+#####################
+### MISKISUGAR ###
+#####################
+
+# base image
+FROM nginx:alpine
+
+# copy artifact build from the 'build environment'
+COPY ./dist/ /usr/share/nginx/html
+RUN rm /etc/nginx/conf.d/default.conf
+COPY /nginx.conf /etc/nginx/conf.d
+# expose port 80
+EXPOSE 81
+
+# run nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# npm run build
+# docker build -t miskisugar -f Dockerfile-build-app .
+# docker save -o d:\KI\Vuejs\miskisugarimages.tar miskisugar
+# docker load -i d:\Inbox\miskisugarimages.tar
+# docker run -itd -p 8081:81 --name miskisugar miskisugar
+
