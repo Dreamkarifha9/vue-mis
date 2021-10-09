@@ -4,9 +4,6 @@ import LocalStorageService from "../service/LocalStorageService";
 //ประกาศ const รอไปใช้งาน
 const localStorageService = LocalStorageService.getService();
 
-// axios.defaults.baseURL = "http://localhost:4444/";
-
-// axios.defaults.baseURL = "http://192.168.14.22:8000";
 axios.defaults.baseURL = process.env.VUE_APP_URL;
 
 let isAlreadyFetchingAccessToken = false;
@@ -29,6 +26,11 @@ axios.interceptors.request.use(
     //       console.log(error);
     //     });
     // }
+
+    //*--- loader ------------------------
+
+    store.commit('LOADER', true);
+    //-------------------------------------------
     if (token) {
       config.headers["Authorization"] = "Bearer " + token;
     }
@@ -40,9 +42,12 @@ axios.interceptors.request.use(
     }
     config.headers["Content-Type"] = "application/json";
     config.headers["Accept"] = "application/json";
+    console.log('config',config)
     return config;
   },
   error => {
+
+    store.commit('LOADER', false);
     Promise.reject(error);
   }
 );
@@ -56,7 +61,8 @@ function addSubscriber(callback) {
 }
 
 axios.interceptors.response.use(
-  function(response) {
+  function (response) {
+    store.commit('LOADER', false);
     return response;
   },
   function(error) {
@@ -66,28 +72,40 @@ axios.interceptors.response.use(
     } = error;
     const originalRequest = config;
     if (status === 401) {
+
       if (!isAlreadyFetchingAccessToken) {
+
         isAlreadyFetchingAccessToken = true;
-        const refreshToken = localStorageService.getRefreshToken();
-        const UserId = localStorageService.getUserId();
-        const data_refresh = { refreshToken: refreshToken, userId: UserId };
-        store.dispatch("user/refreshtoken", data_refresh).then(token => {
-          isAlreadyFetchingAccessToken = false;
-          onAccessTokenFetched(token);
-          console.log(token);
-          localStorageService.setToken(token);
-        });
+        store.dispatch("user/logout");
+        this.$router.push({ name: "home" });
+        store.commit('LOADER', false);
+        // const refreshToken = localStorageService.getRefreshToken();
+        // const UserId = localStorageService.getUserId();
+        // const data_refresh = { refreshToken: refreshToken, userId: UserId };
+        // store.dispatch("user/refreshtoken", data_refresh).then(token => {
+        //   isAlreadyFetchingAccessToken = false;
+        //   onAccessTokenFetched(token);
+        //   localStorageService.setToken(token);
+        // });
+        
       }
       const retryOriginalRequest = new Promise(resolve => {
+
         addSubscriber(access_token => {
           originalRequest.headers.Authorization = "Bearer " + access_token;
           resolve(axios(originalRequest));
         });
       });
+      store.commit('LOADER', false);
       return retryOriginalRequest;
     } else if (status === 403) {
+
+      store.commit('LOADER', false);
       Promise.reject(error.response); //ส่ง reponse object ออกไปเพื่อนำไปใช้งานต่อ
     }
+
+
+    store.commit('LOADER', false);
     return Promise.reject(error);
   }
 );

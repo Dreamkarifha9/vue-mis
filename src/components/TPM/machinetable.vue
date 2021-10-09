@@ -1,97 +1,171 @@
 <template>
-<v-sheet>
-  <v-card-title>
-    <v-flex xs12 md6>
-      <v-btn class="primary" v-on:click="onchangetabCreate(2)">
-        <v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล
-      </v-btn>
-    </v-flex>
-    <v-flex xs12 md3>
-      <v-text-field v-model="search" append-icon="mdi-magnify" label="ค้นหาทั้งหมด" single-line hide-details></v-text-field>
-    </v-flex>
-    <v-flex xs12 md3>
-      <v-autocomplete label="ค้นหาตามแผนก" :items="listdivision" :item-value="item => `${item.divisionname}`" :item-text="item => `${item.divisionname}`" v-model="divisionFilterValue" single-line hide-details></v-autocomplete>
-    </v-flex>
-  </v-card-title>
-  <v-container>
-    <v-data-table :headers="headers" :items="listmachine" sort-by="index" :search="search" item-key="id" class="elevation-" loading loading-text="Loading... Please wait">
-      <template v-slot:[`item.actions`]="{ item }">
-        <v-icon small class="mr-2" color="primary" @click="editItem(item)">
-          mdi-pencil
-        </v-icon>
-        <v-icon small class="mr-2" color="success" @click="detailItem(item)">
-          mdi-image-filter-vintage
-        </v-icon>
-        <!-- <v-icon medium class="mr-2" color="error" @click="deleteItem(item)">
-            mdi-delete
+  <v-sheet>
+    <v-card-title>
+      <v-flex xs12 md6>
+        <v-btn
+          v-if="$can('view_createmachinetpm')"
+          class="ma-2 blue darken-4"
+          color="primary"
+          @click="onchangetabCreate(2)"
+        >
+          <v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล
+        </v-btn>
+      </v-flex>
+
+      <v-flex xs12 md3>
+        <v-autocomplete
+          v-model="divisionFilterValue"
+          label="ค้นหาตามแผนก"
+          :items="listdivision"
+          :item-value="(item) => `${item.id}`"
+          :item-text="(item) => `${item.divisionname}`"
+          outlined
+          single-line
+          hide-details
+          @change="divisionFilter()"
+        ></v-autocomplete>
+      </v-flex>
+      <v-flex xs12 md3 px-2>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="ค้นหาทั้งหมด"
+          outlined
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-flex>
+    </v-card-title>
+    <v-container>
+      <v-data-table
+        dense
+        :headers="headers"
+        :items="itemsWithIndex"
+        :items-per-page="15"
+        :class="responsive"
+        sort-by="index"
+        :search="search"
+        item-key="id"
+        class="elevation-1"
+        :loading="loading"
+      >
+        <template v-slot:[`item.actions`]="{ item }">
+          <!-- <v-icon
+            v-if="$can('view_editmachinetpm')"
+            small
+            class="mr-2"
+            color="primary"
+            @click="editItem(item)"
+          >
+            mdi-pencil
           </v-icon> -->
-      </template>
-      <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize">Reset</v-btn>
-      </template>
-    </v-data-table>
-  </v-container>
-</v-sheet>
+          <v-tooltip top color="black">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-if="$can('view_editmachinetpm')"
+                elevation="2"
+                fab
+                class="teal mr-2 my-1"
+                x-small
+                dark
+                v-bind="attrs"
+                v-on="on"
+                @click="editItem(item)"
+              >
+                <v-icon color="grey lighten-5">
+                  mdi-pencil
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>แก้ไข</span>
+          </v-tooltip>
+
+          <v-tooltip top color="black">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                elevation="4"
+                fab
+                class="mr-2"
+                color="success"
+                x-small
+                v-bind="attrs"
+                v-on="on"
+                @click="detailItem(item)"
+              >
+                <v-icon color="grey lighten-5">
+                  mdi-image-filter-vintage
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>รายละเอียด</span>
+          </v-tooltip>
+        </template>
+        <template v-slot:no-data>
+          <v-btn color="primary" @click="initialize">Reset</v-btn>
+        </template>
+      </v-data-table>
+    </v-container>
+  </v-sheet>
 </template>
 
 <script>
-import {
-  mapGetters
-} from "vuex";
+import { mapGetters } from "vuex";
+import LocalStorageService from "../../service/LocalStorageService";
 
 export default {
-  created() {
-    console.log(process.env.VUE_APP_URL);
-    this.initialize();
-  },
   data() {
     return {
       resultconfirm: false,
       showDialog: false,
       search: "",
-      headers: [{
+      headers: [
+        {
           text: "ลำดับ",
           value: "index",
           sortable: true,
-          width: "2%"
+          width: "8%",
         },
         {
           text: "หมายเลขเครื่อง",
           align: "start",
-          sortable: true,
-          value: "idmachine"
+          sortable: false,
+          value: "idmachine",
+          width: "30%",
         },
         {
           text: "ชื่อเครื่องจักร",
           value: "namethai",
-          sortable: false
+          sortable: false,
+          width: "30%",
         },
-        {
-          text: "ขนาด",
-          value: "sizename",
-          sortable: false
-        },
-        {
-          text: "Capacity",
-          value: "capacityname",
-          sortable: false
-        },
-        {
-          text: "Power",
-          value: "powername",
-          sortable: false
-        },
+        // {
+        //   text: "ขนาด",
+        //   value: "sizename",
+        //   sortable: false
+        // },
+        // {
+        //   text: "Capacity",
+        //   value: "capacityname",
+        //   sortable: false
+        // },
+        // {
+        //   text: "Power",
+        //   value: "powername",
+        //   sortable: false
+        // },
         {
           text: "แผนก",
           value: "divisionname",
-          filter: this.divisionFilter
+          width: "20%",
+          // filter: this.divisionFilter
         },
         {
           text: "Actions",
           value: "actions",
-          sortable: false
-        }
+          sortable: false,
+        },
       ],
+      loading: false,
       editedIndex: -1,
       editmachine: {
         idmachine: "",
@@ -109,54 +183,87 @@ export default {
         manufacturer: "",
         machineinclude: "",
         genration: "",
-        energy: ""
+        energy: "",
       },
-      divisionFilterValue: null
+      divisionFilterValue: null,
     };
+  },
+  created() {
+    this.initialize();
   },
   computed: {
     ...mapGetters({
       listmachine: "tpm/listall",
       resultdialog: "ui/resultdialog",
-      listdivision: "tpm/listdivisions"
-    })
+      listdivision: "tpm/listdivisions",
+    }),
+    itemsWithIndex() {
+      return this.listmachine.map((items, index) => ({
+        ...items,
+        index: index + 1,
+      }));
+    },
   },
   props: ["tab_index"],
   watch: {
     //ดูการเปลี่ยนค่าแล้ว
     resultdialog() {
       this.confirmdelete(this.resultdialog);
-    }
+    },
   },
   methods: {
-    divisionFilter(value) {
+    itemRowBackground: function(item) {
+      let num = item.index % 2;
+      return num === 1
+        ? "cyan lighten-5 !important;"
+        : "cyan lighten-4 !important;";
+    },
+    responsive: function() {},
+    divisionFilter() {
       // If this filter has no value we just skip the entire filter.
+
+      this.divisionFilterValue != 0
+        ? this.$store.dispatch(
+            "tpm/listdivisionallbyid",
+            this.divisionFilterValue
+          )
+        : this.$store.dispatch("tpm/listmachineAll");
+
       if (!this.divisionFilterValue) {
         return true;
       }
-      console.log(this.divisionFilterValue);
       // Check if the current loop value (The calories value)
       // equals to the selected value at the <v-select>.
-      return value === this.divisionFilterValue;
+      return this.divisionFilterValue;
     },
-    Getdivision() {
-      console.log(this.divisionType);
-    },
+    Getdivision() {},
     onchangetabCreate(tab) {
       this.$emit("changetabindex", tab);
     },
     initialize() {
-      this.$store.dispatch("tpm/listmachine");
-      this.$store.dispatch("tpm/listsizemachine");
-      this.$store.dispatch("tpm/listcapacitymachine");
-      this.$store.dispatch("tpm/listpowermachine");
-      this.$store.dispatch("tpm/listdivision");
-      this.$store.dispatch("tpm/listseason");
+      this.$store.dispatch("tpm/listmachineFristpage").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
+      this.$store.dispatch("tpm/listsizemachine").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
+      this.$store.dispatch("tpm/listcapacitymachine").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
+      this.$store.dispatch("tpm/listpowermachine").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
+      this.$store.dispatch("tpm/listdivision").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
+      this.$store.dispatch("tpm/listseason").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
     },
     editItem(item) {
       // go to updateform customer (tabindex=3)
       this.$emit("changetabindex", 3);
-      console.log(item);
+
       this.editedIndex = this.listmachine.indexOf(item);
       this.editmachine = Object.assign({}, item);
       this.$emit("receivedata", this.editmachine);
@@ -165,19 +272,59 @@ export default {
       this.$emit("changetabindex", 4);
       this.editedIndex = this.listmachine.indexOf(item);
       this.editmachine = Object.assign({}, item);
+      var currentyear = LocalStorageService.getYear();
+      var Obj = {
+        idmachine: this.editmachine.idmachine,
+        year: currentyear,
+      };
+      console.log("Obj", Obj);
       this.$store
         .dispatch("tpm/listmachinedetails", this.editmachine.idmachine)
-        .then(() => {
-          this.$store.dispatch("tpm/getimages", this.editmachine.idmachine);
-        })
-        .then(() => {
-          this.$store.dispatch("tpm/getimagesplan", this.editmachine.idmachine); //Read images All in one
+        .catch((err) => {
+          this.$store.commit("LOADER", false);
+        });
+      console.log("this.editmachine.idmachine", this.editmachine.idmachine);
+      this.$store
+        .dispatch("tpm/getimages", this.editmachine.idmachine)
+        .catch((err) => {
+          this.$store.commit("LOADER", false);
         });
 
+      //*** โหลดข้อมูลการทำกิจกรรมของเครื่องจักรนั้นๆ ถ้า season1 ไม่สำเร็จ ให้โหลด season2 ต่อได้เลย*/
+      this.$store
+        .dispatch("machineact/listactseason1", Obj)
+        .then((res) => {
+          this.$store
+            .dispatch("machineact/listactseason2", Obj)
+            .catch((err) => {
+              this.$store.commit("LOADER", false);
+            });
+        })
+        .catch((err) => {
+          this.$store
+            .dispatch("machineact/listactseason2", Obj)
+            .catch((err) => {
+              this.$store.commit("LOADER", false);
+            });
+          console.log("err");
+          this.$store.commit("LOADER", false);
+        });
+      this.$store.dispatch("user/loadUserall");
+      this.$store.dispatch("ncr/listncrfristpage", this.editmachine.idmachine);
+      // this.$store.dispatch("machineact/listactseason2", Obj).catch((err) => {
+      //   this.$store.commit("LOADER", false);
+      // });
+      // this.$store.dispatch(
+      //   "machineact/listactseason1",
+      //   this.editmachine.idmachine
+      // );
+      // this.$store.dispatch(
+      //   "machineact/listactseason2",
+      //   this.editmachine.idmachine
+      // );
       this.$emit("receivedata", this.editmachine);
     },
     deleteItem(item) {
-      console.log(this.listmachine.indexOf(item));
       this.editedIndex = this.listmachine.indexOf(item);
       this.editmachine = Object.assign({}, item);
 
@@ -185,7 +332,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
     },
     close() {
@@ -199,36 +346,82 @@ export default {
       if (value.resultdialogs == true) {
         this.$store
           .dispatch("tpm/deletemachine", this.editmachine)
-          .then(res => {
+          .then((res) => {
             this.$store.dispatch("tpm/listmachine");
             this.$store.dispatch(
-              "snackbar/setSnackbar", {
+              "snackbar/setSnackbar",
+              {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "ลบข้อมูลสำเร็จ !!"
-              }, {
-                root: true
+                text: "ลบข้อมูลสำเร็จ !!",
+              },
+              {
+                root: true,
               }
             );
           })
-          .catch(error => {
+          .catch((error) => {
             this.$store.dispatch(
-              "snackbar/setSnackbar", {
+              "snackbar/setSnackbar",
+              {
                 color: "error",
                 showing: true,
                 timeout: 3000,
-                text: error
-              }, {
-                root: true
+                text: error,
+              },
+              {
+                root: true,
               }
             );
             this.error = true;
           });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style></style>
+<style scoped>
+.style-1 {
+  background-color: rgb(215, 215, 44);
+}
+.style-2 {
+  background-color: rgb(114, 114, 67);
+}
+@media screen and (max-width: 320) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 480) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 600) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 768px) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+
+.v-data-table >>> .v-data-table-header {
+  background-color: #212121;
+}
+.headerbg {
+  background-color: #212121;
+}
+.headerbg span {
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+}
+.v-data-table >>> tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+</style>

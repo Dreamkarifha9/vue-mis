@@ -45,10 +45,9 @@
           ref="division"
           v-model="seasonmachine.id"
           :items="listseason"
-          :item-text="item => `${item.name}`"
-          :item-value="item => `${item.id}`"
+          :item-text="(item) => `${item.name}`"
+          :item-value="(item) => `${item.id}`"
           label="แผนการผลิต"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-autocomplete>
       </v-col>
@@ -93,7 +92,7 @@
       </v-flex>
     </v-row>
     <v-btn
-      class="ma-2"
+      class="ma-2  green accent-4"
       :loading="loading"
       :disabled="!formHasErrorsdetails"
       color="success"
@@ -103,11 +102,11 @@
       บันทึกรูปภาพ
     </v-btn>
     <v-btn
-      class="ma-2"
+      class="ma-2 red accent-4"
       :loading="loading"
       :disabled="!formHasErrorsdetails"
       color="error"
-      v-on:click="onDeleteimgplan"
+      @click="onDeleteimgplan"
     >
       <v-icon>mdi-delete</v-icon>
       ลบรูปภาพ
@@ -131,15 +130,15 @@ export default {
     urldefualt: process.env.VUE_APP_URL,
     seasonmachine: {
       id: "",
-      name: ""
-    }
+      name: "",
+    },
   }),
   computed: {
     ...mapGetters({
       resultdialog: "ui/resultdialog",
       listimageplan: "tpm/listimagesplans",
       listseason: "tpm/listseasons",
-      activetab: "ui/resultactive"
+      activetab: "ui/resultactive",
     }),
     formimage() {
       // comment  >> ใช้ return ค่าให้กับ method customerHandlersubmit
@@ -147,9 +146,9 @@ export default {
         idmachine: this.machinedetail.idmachine,
         name: this.machinedetail.name,
         orders: this.machinedetail.orders,
-        seasonid: this.seasonmachine.id
+        seasonid: this.seasonmachine.id,
       };
-    }
+    },
   },
   watch: {
     //ดูการเปลี่ยนค่าแล้ว
@@ -161,7 +160,7 @@ export default {
     },
     onboarding(val) {
       //รับค่ามาค้นหาใน arrayimage เพื่อที่จะเอาbase64 ไปใช้ต่อ
-      var newarray = this.listimageplan.filter(el => {
+      var newarray = this.listimageplan.filter((el) => {
         return el.index == val;
       });
       // console.log("arraytest  " + newarray[0].id);
@@ -170,7 +169,7 @@ export default {
       this.image = `${this.urldefualt}api/imagesplan/`.concat(
         this.listimageplan[val].pathimage
       );
-    }
+    },
   },
   mounted() {
     if (this.listimageplan.length != 0) {
@@ -195,7 +194,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
       this.$store.commit("ui/set_activetab", "planimage");
     },
@@ -211,7 +210,7 @@ export default {
       }
       this.$store
         .dispatch("tpm/createimagesplan", formDatapic)
-        .then(res => {
+        .then((res) => {
           // this.$store.dispatch("customer/listcustomer");
           this.$store.dispatch(
             "snackbar/setSnackbar",
@@ -219,7 +218,7 @@ export default {
               color: "info",
               showing: true,
               timeout: 2000,
-              text: "บันทึกข้อมูลสำเร็จ !!"
+              text: "บันทึกข้อมูลสำเร็จ !!",
             },
             { root: true }
           );
@@ -232,14 +231,14 @@ export default {
 
           this.$refs.formimage.reset();
         })
-        .catch(error => {
+        .catch((error) => {
           this.$store.dispatch(
             "snackbar/setSnackbar",
             {
               color: "error",
               showing: true,
               timeout: 3000,
-              text: error
+              text: error,
             },
             { root: true }
           );
@@ -251,12 +250,12 @@ export default {
       if (this.activetab == "planimage") {
         if (value.resultdialogs == true) {
           //ลบรูปtabที่4เท่านั้น
-          var newarray = this.listimageplan.filter(el => {
+          var newarray = this.listimageplan.filter((el) => {
             return el.index == this.onboarding;
           });
           this.$store
             .dispatch("tpm/deleteimagesplan", newarray[0].id)
-            .then(res => {
+            .then((res) => {
               this.$store.dispatch("tpm/getimagesplan", this.machine.idmachine);
               this.$store.dispatch(
                 "snackbar/setSnackbar",
@@ -264,19 +263,19 @@ export default {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "ลบข้อมูลสำเร็จ !!"
+                  text: "ลบข้อมูลสำเร็จ !!",
                 },
                 { root: true }
               );
             })
-            .catch(error => {
+            .catch((error) => {
               this.$store.dispatch(
                 "snackbar/setSnackbar",
                 {
                   color: "error",
                   showing: true,
                   timeout: 3000,
-                  text: error
+                  text: error,
                 },
                 { root: true }
               );
@@ -284,8 +283,8 @@ export default {
             });
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

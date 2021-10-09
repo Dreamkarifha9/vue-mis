@@ -1,5 +1,5 @@
 <template>
-<mainlaout></mainlaout>
+  <mainlaout></mainlaout>
 </template>
 
 <script>
@@ -7,16 +7,26 @@ import mainlaout from "../components/Main/Main";
 import LocalStorageService from "../service/LocalStorageService";
 export default {
   components: {
-    mainlaout
+    mainlaout,
   },
   data: () => ({
     status: false,
     eventsource: null,
-    urldefualt: "http://192.168.10.148:8000/"
+    urldefualt: "http://192.168.10.148:8000/",
   }),
   created() {
     // console.log(this.status);
     // this.initializeServerSentEvent();
+  },
+  mounted() {
+    // this.eventsource.onmessage = async function(messageEvent) {
+    //   var eventMsg = messageEvent.data;
+    //   let convertstring = JSON.parse(eventMsg);
+    //   let msg = convertstring.msg;
+    //   let val = convertstring.value;
+    //   console.log(msg);
+    // };
+    // ต้องมาดัก การตอบกลับของ serverevent นะจ๊ะ
   },
   methods: {
     // initializeServerSentEvent() {
@@ -40,16 +50,6 @@ export default {
     //   };
     // }
   },
-  mounted() {
-    // this.eventsource.onmessage = async function(messageEvent) {
-    //   var eventMsg = messageEvent.data;
-    //   let convertstring = JSON.parse(eventMsg);
-    //   let msg = convertstring.msg;
-    //   let val = convertstring.value;
-    //   console.log(msg);
-    // };
-    // ต้องมาดัก การตอบกลับของ serverevent นะจ๊ะ
-  }
 };
 </script>
 

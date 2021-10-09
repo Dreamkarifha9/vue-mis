@@ -11,7 +11,6 @@
           v-model="machinedetail.idmachine"
           :rules="machineRules"
           label="รหัสเครื่องจักร"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -21,7 +20,6 @@
           v-model="machinedetail.orders"
           :rules="[() => !!machinedetail.orders || '*']"
           label="Orders"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -31,7 +29,6 @@
           v-model="machinedetail.name"
           :rules="[() => !!machinedetail.name || '*']"
           label="ชื่อ"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -44,7 +41,7 @@
               v-model="sizemachine"
               :rules="[() => !!sizemachine || '*']"
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
+              
               outlined
             ></v-autocomplete>
           </v-col> -->
@@ -53,7 +50,6 @@
           ref="unit"
           v-model="machinedetail.unit"
           label="Unit"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -62,7 +58,6 @@
           ref="idproduct"
           v-model="machinedetail.idproduct"
           label="Idproduct"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -71,7 +66,6 @@
           ref="w3"
           v-model="machinedetail.w3"
           label="W3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -80,7 +74,6 @@
           ref="m1"
           v-model="machinedetail.m1"
           label="M1"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -89,7 +82,6 @@
           ref="m3"
           v-model="machinedetail.m3"
           label="M3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -98,7 +90,6 @@
           ref="y1"
           v-model="machinedetail.y1"
           label="Y1"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -107,7 +98,6 @@
           ref="y2"
           v-model="machinedetail.y2"
           label="Y2"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -116,7 +106,6 @@
           ref="y3"
           v-model="machinedetail.y3"
           label="Y3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -125,7 +114,6 @@
           ref="oh"
           v-model="machinedetail.oh"
           label="Oh"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -134,13 +122,12 @@
           ref="number"
           v-model="machinedetail.number"
           label="Number"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
     </v-row>
     <v-btn
-      class="ma-2"
+      class="ma-2 green accent-4"
       :loading="loading"
       :disabled="!formHasErrors"
       color="success"
@@ -154,6 +141,7 @@
 
 <script>
 export default {
+  props: ["tab_index", "machine", "machinedetails"],
   data: () => ({
     machinedetail: {
       id: "",
@@ -169,7 +157,7 @@ export default {
       y2: "",
       y3: "",
       oh: "",
-      number: ""
+      number: "",
     },
     formHasErrors: true,
     formHasErrorsdetails: true,
@@ -177,20 +165,19 @@ export default {
     loader: null,
     loading: false,
     machineRules: [
-      v => !!v || "*",
-      v => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร"
-    ]
+      (v) => !!v || "*",
+      (v) => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร",
+    ],
   }),
-  props: ["tab_index", "machine", "machinedetails"],
   computed: {
     form() {
       // comment  >> ใช้ return ค่าให้กับ method customerHandlersubmit
       return {
         idmachine: this.machinedetail.idmachine,
         name: this.machinedetail.name,
-        orders: this.machinedetail.orders
+        orders: this.machinedetail.orders,
       };
-    }
+    },
   },
   methods: {
     async MachinedetailsHandlerSubmit() {
@@ -207,10 +194,10 @@ export default {
         y2: this.machinedetail.y2,
         y3: this.machinedetail.y3,
         oh: this.machinedetail.oh,
-        number: this.machinedetail.number
+        number: this.machinedetail.number,
       };
       this.formHasErrors = false;
-      Object.keys(this.form).forEach(f => {
+      Object.keys(this.form).forEach((f) => {
         if (!this.form[f]) this.formHasErrors = true;
         this.$refs[f].validate(true);
       });
@@ -221,7 +208,7 @@ export default {
 
         this.$store
           .dispatch("tpm/addmachinedetails", formData)
-          .then(res => {
+          .then((res) => {
             // this.$store.dispatch("customer/listcustomer");
             this.$store.dispatch(
               "snackbar/setSnackbar",
@@ -229,7 +216,7 @@ export default {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
+                text: "บันทึกข้อมูลสำเร็จ !!",
               },
               { root: true }
             );
@@ -247,14 +234,14 @@ export default {
             this.$refs.form.resetValidation();
             this.$emit("onsavedetail_receive");
           })
-          .catch(error => {
+          .catch((error) => {
             this.$store.dispatch(
               "snackbar/setSnackbar",
               {
                 color: "error",
                 showing: true,
                 timeout: 3000,
-                text: error
+                text: error,
               },
               { root: true }
             );
@@ -262,8 +249,8 @@ export default {
             this.error = true;
           });
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

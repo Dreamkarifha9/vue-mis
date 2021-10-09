@@ -45,6 +45,12 @@
 </template>
 
 <script>
+import {
+  mapGetters
+} from "vuex";
+  import { VueQuickAcl } from './../../hook/VueQuickAcl'
+ import Vue from 'vue'
+  Vue.use(VueQuickAcl)
 export default {
   data() {
     return {
@@ -54,7 +60,12 @@ export default {
       formHasErrors: false
     };
   },
-  computed: {
+  computed: 
+  {
+    ...mapGetters({
+      listpermissiontables: "permission/listpermissiontables",
+      currentUsers: "user/currentUsers",
+    }),
     form() {
       return {
         username: this.username,
@@ -102,6 +113,9 @@ export default {
               },
               { root: true }
             );
+            this.$store.dispatch("permission/listpermissionall");
+            this.$setUserPermissions(this.currentUsers.data[0].permission, false);
+            
             this.$router.push({ name: "home" });
           })
           .catch(() => {

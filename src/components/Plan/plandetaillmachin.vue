@@ -172,10 +172,9 @@
                   ref="division"
                   v-model="seasonmachine.id"
                   :items="listseason"
-                  :item-text="item => `${item.name}`"
-                  :item-value="item => `${item.id}`"
+                  :item-text="(item) => `${item.name}`"
+                  :item-value="(item) => `${item.id}`"
                   label="แผนการผลิต"
-                  prepend-icon="mdi mdi-pencil"
                   outlined
                 ></v-autocomplete>
               </v-col>
@@ -263,7 +262,7 @@ export default {
     active_tab: 0,
     tabs: [
       { id: 1, name: "แผนช่วงซ่อม" },
-      { id: 2, name: "แผนช่วงผลิต" }
+      { id: 2, name: "แผนช่วงผลิต" },
     ],
     formHasErrors: true,
     formHasErrorsdetails: true,
@@ -280,8 +279,8 @@ export default {
     editedIndex: -1,
     seasonmachine: {
       id: "",
-      name: ""
-    }
+      name: "",
+    },
   }),
   props: ["tab_index", "machine", "machinedetails"],
   created() {
@@ -298,7 +297,7 @@ export default {
       listdivision: "tpm/listdivisions",
       listseason: "tpm/listseasons",
       listplanseason1: "tpm/listplanseason1",
-      listplanseason2: "tpm/listplanseason2"
+      listplanseason2: "tpm/listplanseason2",
     }),
     formimage() {
       // comment  >> ใช้ return ค่าให้กับ method customerHandlersubmit
@@ -306,7 +305,7 @@ export default {
         idmachine: this.machinedetail.idmachine,
         name: this.machinedetail.name,
         orders: this.machinedetail.orders,
-        seasonid: this.seasonmachine.id
+        seasonid: this.seasonmachine.id,
       };
     },
     form2() {
@@ -314,9 +313,9 @@ export default {
       return {
         idmachine: this.machinedetails.idmachine,
         name: this.machinedetails.name,
-        orders: this.machinedetails.orders
+        orders: this.machinedetails.orders,
       };
-    }
+    },
   },
   mounted() {
     if (this.listimageplan.length > 0) {
@@ -341,10 +340,10 @@ export default {
   },
   watch: {
     listimageplan() {
-      var listimg1 = this.listimageplan.filter(el => {
+      var listimg1 = this.listimageplan.filter((el) => {
         return el.seasonid == 1;
       });
-      var listimg2 = this.listimageplan.filter(el => {
+      var listimg2 = this.listimageplan.filter((el) => {
         return el.seasonid == 2;
       });
 
@@ -354,7 +353,7 @@ export default {
     },
     onboarding(val) {
       //รับค่ามาค้นหาใน arrayimage เพื่อที่จะเอาbase64 ไปใช้ต่อ
-      var newarray = this.listimageplan.filter(el => {
+      var newarray = this.listimageplan.filter((el) => {
         return el.index == val;
       });
       // console.log("arraytest  " + newarray[0].id);
@@ -400,7 +399,7 @@ export default {
       } else if (this.active_tab == 0 && alltab == 3) {
         this.tabs.pop({ id: 3 });
       }
-    }
+    },
   },
   methods: {
     initialize() {},
@@ -409,7 +408,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
     },
     next() {
@@ -457,7 +456,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
     },
     onAddtabimageplan() {
@@ -485,10 +484,10 @@ export default {
         formDatapic.append("pathname", "uploadplan/" + file.name);
         formDatapic.append("create_by", userId);
       }
-      console.log(formDatapic);
+
       this.$store
         .dispatch("tpm/createimagesplan", formDatapic)
-        .then(res => {
+        .then((res) => {
           // this.$store.dispatch("customer/listcustomer");
           this.$store.dispatch(
             "snackbar/setSnackbar",
@@ -496,7 +495,7 @@ export default {
               color: "info",
               showing: true,
               timeout: 2000,
-              text: "บันทึกข้อมูลสำเร็จ !!"
+              text: "บันทึกข้อมูลสำเร็จ !!",
             },
             { root: true }
           );
@@ -510,14 +509,14 @@ export default {
           this.$refs.formimage.reset();
           this.active_tab = 0;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$store.dispatch(
             "snackbar/setSnackbar",
             {
               color: "error",
               showing: true,
               timeout: 3000,
-              text: error
+              text: error,
             },
             { root: true }
           );
@@ -547,10 +546,10 @@ export default {
         y2: this.machinedetails.y2,
         y3: this.machinedetails.y3,
         oh: this.machinedetails.oh,
-        number: this.machinedetails.number
+        number: this.machinedetails.number,
       };
       this.formHasErrorsdetails = false;
-      Object.keys(this.form2).forEach(f => {
+      Object.keys(this.form2).forEach((f) => {
         if (!this.form2[f]) this.formHasErrorsdetails = true;
         this.$refs[f].validate(true);
       });
@@ -559,7 +558,7 @@ export default {
         // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
         this.$store
           .dispatch("tpm/updatemachinedetails", formData)
-          .then(res => {
+          .then((res) => {
             this.$store.dispatch("tpm/updateimages", formDatapic);
             // this.$store.dispatch("customer/listcustomer");
             this.$store.dispatch(
@@ -568,7 +567,7 @@ export default {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
+                text: "บันทึกข้อมูลสำเร็จ !!",
               },
               { root: true }
             );
@@ -585,14 +584,14 @@ export default {
             this.formHasErrorsdetails = true;
             this.active_tab = 1;
           })
-          .catch(error => {
+          .catch((error) => {
             this.$store.dispatch(
               "snackbar/setSnackbar",
               {
                 color: "error",
                 showing: true,
                 timeout: 3000,
-                text: error
+                text: error,
               },
               { root: true }
             );
@@ -615,10 +614,10 @@ export default {
         y2: this.machinedetail.y2,
         y3: this.machinedetail.y3,
         oh: this.machinedetail.oh,
-        number: this.machinedetail.number
+        number: this.machinedetail.number,
       };
       this.formHasErrors = false;
-      Object.keys(this.form).forEach(f => {
+      Object.keys(this.form).forEach((f) => {
         if (!this.form[f]) this.formHasErrors = true;
         this.$refs[f].validate(true);
       });
@@ -627,7 +626,7 @@ export default {
         // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
         this.$store
           .dispatch("tpm/addmachinedetails", formData)
-          .then(res => {
+          .then((res) => {
             // this.$store.dispatch("customer/listcustomer");
             this.$store.dispatch(
               "snackbar/setSnackbar",
@@ -635,7 +634,7 @@ export default {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
+                text: "บันทึกข้อมูลสำเร็จ !!",
               },
               { root: true }
             );
@@ -653,14 +652,14 @@ export default {
             this.$refs.form.resetValidation();
             this.active_tab = 1;
           })
-          .catch(error => {
+          .catch((error) => {
             this.$store.dispatch(
               "snackbar/setSnackbar",
               {
                 color: "error",
                 showing: true,
                 timeout: 3000,
-                text: error
+                text: error,
               },
               { root: true }
             );
@@ -673,13 +672,13 @@ export default {
       if (value.resultdialogs == true) {
         if (this.active_tab == 2) {
           //ลบรูปtabที่4เท่านั้น
-          var newarray = this.listimageplan.filter(el => {
+          var newarray = this.listimageplan.filter((el) => {
             return el.index == this.onboarding;
           });
-          console.log(newarray[0].id);
+
           this.$store
             .dispatch("tpm/deleteimagesplan", newarray[0].id)
-            .then(res => {
+            .then((res) => {
               this.$store.dispatch("tpm/getimagesplan", this.machine.idmachine);
               this.$store.dispatch(
                 "snackbar/setSnackbar",
@@ -687,19 +686,19 @@ export default {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "ลบข้อมูลสำเร็จ !!"
+                  text: "ลบข้อมูลสำเร็จ !!",
                 },
                 { root: true }
               );
             })
-            .catch(error => {
+            .catch((error) => {
               this.$store.dispatch(
                 "snackbar/setSnackbar",
                 {
                   color: "error",
                   showing: true,
                   timeout: 3000,
-                  text: error
+                  text: error,
                 },
                 { root: true }
               );
@@ -709,7 +708,7 @@ export default {
           // ลบข้อมูลทั่วไป
           this.$store
             .dispatch("tpm/deletedetailsmachine", this.machinedetail)
-            .then(res => {
+            .then((res) => {
               this.$store.dispatch(
                 "tpm/listmachinedetails",
                 this.machinedetail.idmachine
@@ -720,19 +719,19 @@ export default {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "ลบข้อมูลสำเร็จ !!"
+                  text: "ลบข้อมูลสำเร็จ !!",
                 },
                 { root: true }
               );
             })
-            .catch(error => {
+            .catch((error) => {
               this.$store.dispatch(
                 "snackbar/setSnackbar",
                 {
                   color: "error",
                   showing: true,
                   timeout: 3000,
-                  text: error
+                  text: error,
                 },
                 { root: true }
               );
@@ -740,8 +739,8 @@ export default {
             });
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

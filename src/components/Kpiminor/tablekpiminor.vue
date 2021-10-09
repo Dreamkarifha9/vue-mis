@@ -2,9 +2,9 @@
   <v-sheet>
     <v-card-title>
       <v-flex xs12 md8>
-        <v-btn class="primary" v-on:click="onchangetabCreate(2)"
-          ><v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล</v-btn
-        >
+        <v-btn class="primary" @click="onchangetabCreate(2)">
+          <v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล
+        </v-btn>
       </v-flex>
       <v-flex xs12 md3>
         <v-text-field
@@ -18,14 +18,14 @@
     </v-card-title>
     <v-container>
       <v-data-table
+        dense
         :headers="headers"
         :items="listkpiminor"
+        :items-per-page="15"
         sort-by="index"
         :search="search"
         item-key="id"
-        class="elevation-"
-        loading
-        loading-text="Loading... Please wait"
+        class="elevation-1"
       >
         <template v-slot:[`item.datecurrent`]="{ item }">
           {{ getConvertDate(item.datecurrent) }}
@@ -53,24 +53,31 @@
 import { mapGetters } from "vuex";
 import moment from "moment";
 export default {
-  created() {
-    this.initialize();
-  },
   data() {
     return {
       resultconfirm: false,
       showDialog: false,
       search: "",
       headers: [
-        { text: "ลำดับ", value: "index", sortable: true, width: "2%" },
+        {
+          text: "ลำดับ",
+          value: "index",
+          sortable: true,
+          width: "2%",
+        },
         {
           text: "วันที่",
           align: "start",
-          sortable: true,
+          sortable: false,
           value: "datecurrent",
-          width: "90%"
+          width: "90%",
         },
-        { text: "Actions", value: "actions", sortable: false, width: "8%" }
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+          width: "8%",
+        },
       ],
       editedIndex: -1,
       kpiminoredit: {
@@ -79,28 +86,31 @@ export default {
         create_date: "",
         create_by: "",
         update_date: "",
-        update_by: ""
+        update_by: "",
       },
-      divisionFilterValue: null
+      divisionFilterValue: null,
     };
+  },
+  created() {
+    this.initialize();
   },
   computed: {
     ...mapGetters({
       listkpiminor: "kpiminor/listkpiminoralls",
-      resultdialog: "ui/resultdialog"
-    })
+      resultdialog: "ui/resultdialog",
+    }),
   },
   props: ["tab_index"],
   watch: {
     //ดูการเปลี่ยนค่าแล้ว
     resultdialog() {
       this.confirmdelete(this.resultdialog);
-    }
+    },
   },
   methods: {
     getConvertDate: function(date) {
       if (date) {
-        return moment(date).format("YYYY-MM-DD");
+        return moment(date).format("DD-MM-YYYY");
       }
     },
     divisionFilter(value) {
@@ -113,14 +123,14 @@ export default {
       // equals to the selected value at the <v-select>.
       return value === this.divisionFilterValue;
     },
-    Getdivision() {
-      console.log(this.divisionType);
-    },
+    Getdivision() {},
     onchangetabCreate(tab) {
       this.$emit("changetabindex", tab);
     },
     initialize() {
-      this.$store.dispatch("kpiminor/listkpiminorall");
+      this.$store.dispatch("kpiminor/listkpiminorall").catch((err) => {
+        this.$store.commit("LOADER", false);
+      });
     },
     editItem(item) {
       // go to updateform customer (tabindex=3)
@@ -165,8 +175,8 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 

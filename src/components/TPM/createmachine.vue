@@ -22,7 +22,6 @@
               :rules="machineRules"
               :error-messages="errorMessages"
               label="รหัสเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -34,7 +33,6 @@
               :rules="[() => !!machine.namethai || '*']"
               :error-messages="errorMessages"
               label="ชื่อเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -46,7 +44,6 @@
               :rules="[() => !!machine.nameeng || '*']"
               :error-messages="errorMessages"
               label="ชื่อภาษาอังกฤษ"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -60,50 +57,47 @@
               v-model="sizemachine"
               :rules="[() => !!sizemachine || '*']"
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
+              
               outlined
             ></v-autocomplete>
           </v-col> -->
           <v-col cols="12" sm="12" md="4">
             <v-autocomplete
               ref="sizemachine"
-              :items="listsizename"
-              :item-text="item => `${item.sizename}`"
-              :item-value="item => `${item.id}`"
               v-model="machine.sizemachine"
+              :items="listsizename"
+              :item-text="(item) => `${item.sizename}`"
+              :item-value="(item) => `${item.id}`"
               :error-messages="errorMessages"
               :rules="[() => !!machine.sizemachine || '*']"
               required
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" sm="12" md="4">
             <v-autocomplete
               ref="capacity"
-              :items="listcapacityname"
-              :item-text="item => `${item.capacityname}`"
-              :item-value="item => `${item.id}`"
               v-model="machine.capacity"
+              :items="listcapacityname"
+              :item-text="(item) => `${item.capacityname}`"
+              :item-value="(item) => `${item.id}`"
               :rules="[() => !!machine.capacity || '*']"
               :error-messages="errorMessages"
               label="capacity"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" sm="12" md="4">
             <v-autocomplete
               ref="power"
-              :items="listpowername"
-              :item-text="item => `${item.powername}`"
-              :item-value="item => `${item.id}`"
               v-model="machine.power"
+              :items="listpowername"
+              :item-text="(item) => `${item.powername}`"
+              :item-value="(item) => `${item.id}`"
               :error-messages="errorMessages"
               :rules="[() => !!machine.power || '*']"
               label="Power"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-autocomplete>
@@ -111,14 +105,13 @@
           <v-col cols="12" sm="12" md="4">
             <v-autocomplete
               ref="division"
-              :items="listdivision"
-              :item-text="item => `${item.divisionname}`"
-              :item-value="item => `${item.id}`"
               v-model="machine.division"
+              :items="listdivision"
+              :item-text="(item) => `${item.divisionname}`"
+              :item-value="(item) => `${item.id}`"
               :error-messages="errorMessages"
               :rules="[() => !!machine.division || '*']"
               label="แผนก"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-autocomplete>
@@ -130,7 +123,6 @@
               :error-messages="errorMessages"
               :rules="[() => !!machine.point || '*']"
               label="Point"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -142,7 +134,6 @@
               :error-messages="errorMessages"
               :rules="[() => !!machine.model || '*']"
               label="Model"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -154,7 +145,6 @@
               :rules="[() => !!machine.nummachine || '*']"
               :error-messages="errorMessages"
               label="Nummachine"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -166,7 +156,6 @@
               :rules="[() => !!machine.usejob || '*']"
               :error-messages="errorMessages"
               label="Usejob"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -178,7 +167,6 @@
               :rules="[() => !!machine.capability || '*']"
               :error-messages="errorMessages"
               label="Capability"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -190,7 +178,6 @@
               :rules="[() => !!machine.manufacturer || '*']"
               :error-messages="errorMessages"
               label="manufacturer"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -202,7 +189,6 @@
               :rules="[() => !!machine.machineineinclude || '*']"
               :error-messages="errorMessages"
               label="Machineineinclude"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -214,7 +200,6 @@
               :rules="[() => !!machine.genration || '*']"
               :error-messages="errorMessages"
               label="Genration"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -226,14 +211,13 @@
               :rules="[() => !!machine.energy || '*']"
               :error-messages="errorMessages"
               label="Energy"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
           </v-col>
         </v-row>
         <v-btn
-          class="ma-2"
+          class="ma-2 green accent-4"
           :loading="loading"
           :disabled="!formHasErrors"
           color="success"
@@ -242,7 +226,11 @@
           <v-icon>mdi mdi-content-save</v-icon>
           บันทึกข้อมูล
         </v-btn>
-        <v-btn class="ma-2" color="error" v-on:click="onChange_tabIndex">
+        <v-btn
+          class="ma-2 red accent-4"
+          color="error"
+          @click="onChange_tabIndex"
+        >
           <v-icon>mdi mdi-undo</v-icon>
           กลับ
         </v-btn>
@@ -254,6 +242,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  props: ["tab_index"],
   data: () => ({
     items: ["นาย", "นาง", "นางสาว"],
     formHasErrors: true,
@@ -276,20 +265,19 @@ export default {
       manufacturer: "",
       machineineinclude: "",
       genration: "",
-      energy: ""
+      energy: "",
     },
     machineRules: [
-      v => !!v || "*",
-      v => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร"
-    ]
+      (v) => !!v || "*",
+      (v) => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร",
+    ],
   }),
-  props: ["tab_index"],
   computed: {
     ...mapGetters({
       listsizename: "tpm/listsizenames",
       listcapacityname: "tpm/listcapacitynames",
       listpowername: "tpm/listpowernames",
-      listdivision: "tpm/listdivisions"
+      listdivision: "tpm/listdivisions",
     }),
     form() {
       // comment  >> ใช้ return ค่าให้กับ method customerHandlersubmit
@@ -309,9 +297,9 @@ export default {
         manufacturer: this.machine.manufacturer,
         machineineinclude: this.machine.machineineinclude,
         genration: this.machine.genration,
-        energy: this.machine.energy
+        energy: this.machine.energy,
       };
-    }
+    },
   },
   watch: {
     loader() {
@@ -321,7 +309,7 @@ export default {
       setTimeout(() => (this[l] = false), 3000);
 
       this.loader = null;
-    }
+    },
   },
   methods: {
     async onChange_tabIndex() {
@@ -344,13 +332,12 @@ export default {
         manufacturer: this.machine.manufacturer,
         machineinclude: this.machine.machineineinclude,
         genration: this.machine.genration,
-        energy: this.machine.energy
+        energy: this.machine.energy,
       };
 
       this.formHasErrors = false;
-      Object.keys(this.form).forEach(f => {
+      Object.keys(this.form).forEach((f) => {
         if (!this.form[f]) this.formHasErrors = true;
-        console.log(f);
         this.$refs[f].validate(true);
       });
       //ถ้าไม่มี error ให้ กด ส่งข้อมูล
@@ -358,7 +345,7 @@ export default {
         // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
         this.$store
           .dispatch("tpm/addmachine", formData)
-          .then(res => {
+          .then((res) => {
             // this.$store.dispatch("customer/listcustomer");
 
             this.$store.dispatch(
@@ -367,7 +354,7 @@ export default {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
+                text: "บันทึกข้อมูลสำเร็จ !!",
               },
               { root: true }
             );
@@ -377,8 +364,7 @@ export default {
             // });
             this.onChange_tabIndex();
           })
-          .catch(error => {
-            console.log(error.response.data.error);
+          .catch((error) => {
             // let stasave = this.$store.state("tpm/statussave");
             this.$store.dispatch(
               "snackbar/setSnackbar",
@@ -386,7 +372,7 @@ export default {
                 color: "error",
                 showing: true,
                 timeout: 10000,
-                text: `${error.response.data.error}   ${error.response.status}`
+                text: `${error.response.data.error}   ${error.response.status}`,
               },
               { root: true }
             );
@@ -404,8 +390,8 @@ export default {
         return true;
       }
       return false;
-    }
-  }
+    },
+  },
 };
 </script>
 

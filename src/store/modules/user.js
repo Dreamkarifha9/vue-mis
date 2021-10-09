@@ -1,21 +1,33 @@
 import axios from "../../service/axios-auth";
 import router from "../../router";
-
+import { GetAesString,GetDAesString } from '../../hook/crypto'
 export default {
   namespaced: true,
   state: {
     profile: {},
     token: localStorage.getItem("access_token") || null,
-    currentUser: {},
+    currentUser: [],
     errors: null,
-    roles: null
+    roles: null,
+    userall: [],
+    key: "dreamkarifha"
   },
   mutations: {
+    SET_PERMISSION (state, data) {
+      // const cipher = CryptoJS.AES.encrypt(data, CryptoJS.enc.Utf8.parse(key), {
+      //   iv: CryptoJS.enc.Utf8.parse(iv),
+      //   mode: CryptoJS.mode.CBC
+      // });
+      // console.log(GetAesString(data))
+    },
     SET_ROLE(state, roles) {
       state.roles = roles;
     },
     SET_USERS(state, users) {
       state.profile = users;
+    },
+    SET_USERSALL (state, users) {
+      state.userall = users
     },
     authUser(state, userData) {
       state.idToken = userData.token;
@@ -28,7 +40,7 @@ export default {
       state.idToken = null;
       state.userId = null;
     },
-    SET_CURRENT_USER(state, user) {
+    SET_CURRENT_USER (state, user) {
       state.currentUser = user;
       state.token = user.token;
     },
@@ -49,10 +61,11 @@ export default {
           })
           .then(({ data, status }) => {
             if (status === 200) {
-              console.log(data);
               const now = new Date();
               const expirationDate = new Date(data.expiresIn);
               commit("LOGOUT_USER");
+              console.log('data', data)
+              
               localStorage.removeItem("expirationDate");
               localStorage.removeItem("access_token");
               localStorage.removeItem("refresh_token");
@@ -60,11 +73,31 @@ export default {
               //clear localstorage
               localStorage.setItem("access_token", data.token);
               localStorage.setItem("refresh_token", data.refreshToken);
-              localStorage.setItem("userId", data.data.user_id);
+              localStorage.setItem("userId", data.data[0].user_id);
+              localStorage.setItem("username", data.data[0].username);
+
+              localStorage.setItem("username", data.data[0].name);
+
               localStorage.setItem("expirationDate", expirationDate);
               //set Role
-              localStorage.setItem("roles", data.data.roles);
+              localStorage.setItem("roles", data.data[0].roles);
+              
+              var currentyear = now.getFullYear();
+              currentyear = currentyear + 543;
+
+              localStorage.setItem("cy", currentyear);
+        
+
+              
               commit("SET_CURRENT_USER", data);
+
+              commit("SET_PERMISSION", data.data[0].permission);
+
+              
+ 
+
+              localStorage.setItem("permission", GetAesString(data.data[0].permission.toString(), "dreamkarifha"))
+
               resolve(true);
             }
           })
@@ -94,6 +127,13 @@ export default {
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("token");
       localStorage.removeItem("userId");
+      localStorage.removeItem("permission");
+      localStorage.removeItem("user");
+      localStorage.removeItem("roles"); 
+      localStorage.removeItem("username");
+      
+
+
       router.replace("/");
       // return new Promise((resolve, reject) => {
       //   axios
@@ -126,6 +166,16 @@ export default {
       }
       commit("SET_USERS", state.currentUser.data);
     },
+    async loadUserall({ commit, dispatch }) {
+      await axios
+      .get(`/api/userall`)
+        .then(({ data }) => {
+        commit("SET_USERSALL", data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    },
     refreshtoken({ commit, dispatch }, Inforefrestoken) {
       return new Promise((resolve, reject) => {
         const refrestokens = {
@@ -135,12 +185,9 @@ export default {
         axios
           .post("/api/refreshtoken", refrestokens)
           .then(response => {
-            console.log(response.data);
             resolve(response.data);
           })
           .catch(error => {
-            console.log("66");
-            console.log(error);
             reject(error);
           });
       });
@@ -158,6 +205,71 @@ export default {
 
       // try login from created  app.vue
       commit("SET_CURRENT_USER", state.currentUser);
+    },
+    async updateusers({ commit, dispatch }, users) {
+      return new Promise((resolve, reject) => {
+        const userId = localStorage.getItem("userId");
+        const postData = {
+          userid: users.user,
+          permission: users.permission,
+          update_by: userId
+        };
+        axios
+          .post("/api/updateuser/" + users.user, postData)
+          .then(({ status }) => {
+            if (status === 200) {
+              resolve({ status });
+            }
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    },
+    async updatepassword({ commit, dispatch }, users) {
+      return new Promise((resolve, reject) => {
+        const userId = localStorage.getItem("userId");
+        const postData = {
+          user_id: users.user_id,
+          password: users.password,
+          update_by: userId
+        };
+
+        axios
+          .post("/api/updatepassword/" + users.user_id, postData)
+          .then(({ status }) => {
+            if (status === 201) {
+              resolve({ status });
+            }
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
+    },
+    async adduser({ commit, dispatch }, users) {
+      return new Promise((resolve, reject) => {
+        const userId = localStorage.getItem("userId");
+        const postData = {
+          name: users.name,
+          username: users.username,
+          password: users.password,
+          is_active: users.is_active,
+          employee_id: users.employee_id,
+          division: users.division,
+          createby: userId
+        };
+        axios
+          .post("/api/register", postData)
+          .then(({ status }) => {
+            if (status === 200) {
+              resolve({ status });
+            }
+          })
+          .catch(error => {
+            reject(error);
+          });
+      });
     }
   },
   getters: {
@@ -165,6 +277,8 @@ export default {
       return state.token !== null;
     },
     errors: state => state.errors,
-    profiles: state => state.profile
+    profiles: state => state.profile,
+    useralls: state => state.userall,
+    currentUsers: state => state.currentUser
   }
 };

@@ -71,9 +71,39 @@
               </v-btn>
             </v-file-input>
           </v-col>
+          <v-col cols="12" sm="12" md="4">
+            <v-autocomplete
+              ref="division"
+              v-model="division"
+              :items="listdivision"
+              :item-text="(item) => `${item.divisionname}`"
+              :item-value="(item) => `${item.id}`"
+              label="แผนก"
+              required
+              outlined
+            ></v-autocomplete>
+          </v-col>
+          <v-col cols="12" sm="12" md="4">
+            <v-checkbox
+              v-model="divisioncheck"
+              label="บันทึกรูปรวมทั้งหมดของแผนก"
+              color="red"
+              hide-details
+              class="chkbox"
+            ></v-checkbox>
+          </v-col>
+          <v-col cols="12" sm="12" md="4">
+            <v-checkbox
+              v-model="divisioncheckall"
+              label="บันทึกรูปรวมทั้งหมดทุกแผนก"
+              color="red"
+              hide-details
+              class="chkbox"
+            ></v-checkbox>
+          </v-col>
         </v-row>
         <v-btn
-          class="ma-2"
+          class="ma-2 green accent-4"
           :loading="loading"
           :disabled="!formHasErrors"
           color="success"
@@ -82,7 +112,11 @@
           <v-icon>mdi mdi-content-save</v-icon>
           บันทึกข้อมูล
         </v-btn>
-        <v-btn class="ma-2" color="error" v-on:click="onChange_tabIndex">
+        <v-btn
+          class="ma-2 red accent-4"
+          color="error"
+          @click="onChange_tabIndex"
+        >
           <v-icon>mdi mdi-undo</v-icon>
           กลับ
         </v-btn>
@@ -94,19 +128,23 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  props: ["tab_index"],
   data: () => ({
     formHasErrors: true,
     errorMessages: null,
     loader: null,
     loading: false,
     files: [],
-    date: new Date().toISOString().substr(0, 10)
+    date: new Date().toISOString().substr(0, 10),
+    division: 0,
+    divisioncheck: false,
+    divisioncheckall: false,
   }),
-  props: ["tab_index"],
   computed: {
     ...mapGetters({
-      resultdialog: "ui/resultdialog"
-    })
+      resultdialog: "ui/resultdialog",
+      listdivision: "tpm/listdivisions",
+    }),
   },
   watch: {
     loader() {
@@ -116,11 +154,10 @@ export default {
       setTimeout(() => (this[l] = false), 3000);
 
       this.loader = null;
-    }
+    },
   },
   methods: {
     async onChange_tabIndex() {
-      console.log(this.date);
       this.$emit("changetabindex", 1);
     },
     async MachineHandlerSubmit() {
@@ -137,23 +174,26 @@ export default {
       const formData = {
         datecurrent: this.date,
         id: uuid,
-        create_by: userId
+        create_by: userId,
+        division_fk: this.division,
+        division_status: this.divisioncheck,
+        division_statusall: this.divisioncheckall,
       };
 
       this.$store
         .dispatch("kpimain/addkpimain", formData)
-        .then(res => {
+        .then((res) => {
           // this.$store.dispatch("customer/listcustomer");
           this.$store
             .dispatch("kpimain/createimageskpimain", formDatapic)
-            .then(res => {
+            .then((res) => {
               this.$store.dispatch(
                 "snackbar/setSnackbar",
                 {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "บันทึกข้อมูลสำเร็จ !!"
+                  text: "บันทึกข้อมูลสำเร็จ !!",
                 },
                 { root: true }
               );
@@ -163,7 +203,7 @@ export default {
               // });
               this.onChange_tabIndex();
             })
-            .catch(error => {
+            .catch((error) => {
               // let stasave = this.$store.state("tpm/statussave");
               this.$store.dispatch(
                 "snackbar/setSnackbar",
@@ -171,7 +211,7 @@ export default {
                   color: "error",
                   showing: true,
                   timeout: 10000,
-                  text: `${error}   ${error.response.status}`
+                  text: `${error}   ${error.response.status}`,
                 },
                 { root: true }
               );
@@ -179,7 +219,7 @@ export default {
               this.error = true;
             });
         })
-        .catch(error => {
+        .catch((error) => {
           // let stasave = this.$store.state("tpm/statussave");
           this.$store.dispatch(
             "snackbar/setSnackbar",
@@ -187,7 +227,7 @@ export default {
               color: "error",
               showing: true,
               timeout: 10000,
-              text: `${error.response.data.message}   ${error.response.status}`
+              text: `${error.response.data.message}   ${error.response.status}`,
             },
             { root: true }
           );
@@ -196,18 +236,22 @@ export default {
         });
     },
     uuidv4() {
-      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+      return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
         (
           c ^
           (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))
         ).toString(16)
       );
-    }
-  }
+    },
+  },
 };
 </script>
 
 <style scoped>
+.chkbox {
+  margin-top: -20px;
+  margin-left: 30px;
+}
 .custom-loader {
   animation: loader 1s infinite;
   display: flex;

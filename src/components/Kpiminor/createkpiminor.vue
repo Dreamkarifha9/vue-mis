@@ -120,7 +120,7 @@ export default {
   },
   methods: {
     async onChange_tabIndex() {
-      console.log(this.date);
+
       this.$emit("changetabindex", 1);
     },
     async MachineHandlerSubmit() {

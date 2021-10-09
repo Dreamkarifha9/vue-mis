@@ -83,7 +83,7 @@
       </v-flex>
     </v-row>
     <v-btn
-      class="ma-2"
+      class="ma-2 green accent-4"
       :loading="loading"
       :disabled="!formHasErrorsdetails"
       color="success"
@@ -93,11 +93,11 @@
       บันทึกรูปภาพ
     </v-btn>
     <v-btn
-      class="ma-2"
+      class="ma-2 red accent-4"
       :loading="loading"
       :disabled="!formHasErrorsdetails"
       color="error"
-      v-on:click="onDeleteimg"
+      @click="onDeleteimg"
     >
       <v-icon>mdi-delete</v-icon>
       ลบรูปภาพ
@@ -108,6 +108,7 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 export default {
+  props: ["tab_index", "machine", "machinedetails"],
   data: () => ({
     length: 0,
     onboarding: 0,
@@ -117,19 +118,18 @@ export default {
     files: [],
     loading: false,
     // urldefualt: "http://192.168.14.22:8000/",
-    urldefualt: process.env.VUE_APP_URL
+    urldefualt: process.env.VUE_APP_URL,
   }),
   created() {
     this.active_tab = 6;
   },
-  props: ["tab_index", "machine", "machinedetails"],
   computed: {
     ...mapGetters({
       listmachinedetails: "tpm/listmachinedetailsall",
       listimage: "tpm/listimages",
       resultdialog: "ui/resultdialog",
-      activetab: "ui/resultactive"
-    })
+      activetab: "ui/resultactive",
+    }),
   },
   watch: {
     listimage() {
@@ -140,7 +140,7 @@ export default {
     },
     onboarding(val) {
       //รับค่ามาค้นหาใน arrayimage เพื่อที่จะเอาbase64 ไปใช้ต่อ
-      var newarray = this.listimage.filter(el => {
+      var newarray = this.listimage.filter((el) => {
         return el.index == val;
       });
       // console.log("arraytest  " + newarray[0].id);
@@ -149,7 +149,7 @@ export default {
       this.image = `${this.urldefualt}api/images/`.concat(
         this.listimage[val].pathimage
       );
-    }
+    },
   },
   mounted() {
     if (this.listimage.length != 0) {
@@ -173,7 +173,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่1 ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
       this.$store.commit("ui/set_activetab", "tabmachineimage");
     },
@@ -188,7 +188,7 @@ export default {
       }
       this.$store
         .dispatch("tpm/createimages", formDatapic)
-        .then(res => {
+        .then((res) => {
           // this.$store.dispatch("customer/listcustomer");
           this.$store.dispatch(
             "snackbar/setSnackbar",
@@ -196,7 +196,7 @@ export default {
               color: "info",
               showing: true,
               timeout: 2000,
-              text: "บันทึกข้อมูลสำเร็จ !!"
+              text: "บันทึกข้อมูลสำเร็จ !!",
             },
             { root: true }
           );
@@ -209,14 +209,14 @@ export default {
           this.$refs.formimage.reset();
           this.active_tab = 6;
         })
-        .catch(error => {
+        .catch((error) => {
           this.$store.dispatch(
             "snackbar/setSnackbar",
             {
               color: "error",
               showing: true,
               timeout: 3000,
-              text: error
+              text: error,
             },
             { root: true }
           );
@@ -227,12 +227,13 @@ export default {
     confirmdelete(value) {
       if (this.activetab == "tabmachineimage") {
         if (value.resultdialogs == true) {
-          var newarray = this.listimage.filter(el => {
+          var newarray = this.listimage.filter((el) => {
             return el.index == this.onboarding;
           });
+
           this.$store
-            .dispatch("tpm/deleteimages", newarray[0].id)
-            .then(res => {
+            .dispatch("tpm/deleteimages", this.listimage[this.onboarding].id)
+            .then((res) => {
               this.$store.dispatch("tpm/getimages", this.machine.idmachine);
               this.$store.dispatch(
                 "snackbar/setSnackbar",
@@ -240,19 +241,19 @@ export default {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "ลบข้อมูลสำเร็จ !!"
+                  text: "ลบข้อมูลสำเร็จ !!",
                 },
                 { root: true }
               );
             })
-            .catch(error => {
+            .catch((error) => {
               this.$store.dispatch(
                 "snackbar/setSnackbar",
                 {
                   color: "error",
                   showing: true,
                   timeout: 3000,
-                  text: error
+                  text: error,
                 },
                 { root: true }
               );
@@ -260,8 +261,8 @@ export default {
             });
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

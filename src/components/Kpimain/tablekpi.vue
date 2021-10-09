@@ -1,16 +1,51 @@
 <template>
   <v-sheet>
     <v-card-title>
-      <v-flex xs12 md8>
-        <v-btn class="primary" v-on:click="onchangetabCreate(2)"
-          ><v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล</v-btn
+      <v-flex xs12 md8 class="ontop">
+        <v-btn
+          v-if="$can('view_createkpimain')"
+          class="blue darken-4"
+          color="primary"
+          @click="onchangetabCreate(2)"
         >
+          <v-icon px-2>mdi mdi-plus-circle</v-icon>เพิ่มข้อมูล
+        </v-btn>
+        <v-btn
+          v-if="$can('view_readkpimain')"
+          class="blue darken-4 ml-2"
+          color="primary"
+          @click="ondivision_status()"
+        >
+          <v-icon px-2>mdi-account-search</v-icon>ค้นหาข้อมูลรวมทั้งแผนก
+        </v-btn>
+        <v-btn
+          v-if="$can('view_readkpimain')"
+          class="blue darken-4 ml-2"
+          color="primary"
+          @click="ondivision_statusall()"
+        >
+          <v-icon px-2>mdi-account-search</v-icon>ค้นหาข้อมูลรวมทั้งหมด
+        </v-btn>
       </v-flex>
-      <v-flex xs12 md3>
+      <v-flex xs12 md2 px-2>
+        <v-autocomplete
+          v-model="divisionFilterValue"
+          label="ค้นหาตามแผนก"
+          :items="listdivision"
+          :item-value="(item) => `${item.id}`"
+          :item-text="(item) => `${item.divisionname}`"
+          single-line
+          hide-details
+          outlined
+          @change="divisionFilter()"
+        ></v-autocomplete>
+      </v-flex>
+      <v-flex xs12 md2>
         <v-text-field
           v-model="search"
           append-icon="mdi-magnify"
           label="ค้นหาทั้งหมด"
+          outlined
           single-line
           hide-details
         ></v-text-field>
@@ -18,22 +53,39 @@
     </v-card-title>
     <v-container>
       <v-data-table
+        dense
         :headers="headers"
-        :items="listkpimain"
+        :items="itemsWithIndex"
+        :items-per-page="15"
         sort-by="index"
         :search="search"
         item-key="id"
         class="elevation-"
-        loading
-        loading-text="Loading... Please wait"
       >
         <template v-slot:[`item.datecurrent`]="{ item }">
           {{ getConvertDate(item.datecurrent) }}
         </template>
         <template v-slot:[`item.actions`]="{ item }">
-          <v-icon small class="mr-2" color="primary" @click="editItem(item)">
-            mdi-pencil
-          </v-icon>
+          <v-tooltip top color="black">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-if="$can('view_editkpimain') || $can('view_readkpimain')"
+                elevation="2"
+                fab
+                class="teal mr-2 my-1"
+                x-small
+                dark
+                v-bind="attrs"
+                v-on="on"
+                @click="editItem(item)"
+              >
+                <v-icon color="grey lighten-5">
+                  mdi-pencil
+                </v-icon>
+              </v-btn>
+            </template>
+            <span>แก้ไข</span>
+          </v-tooltip>
           <!-- <v-icon small class="mr-2" color="success" @click="detailItem(item)">
             mdi-image-filter-vintage
           </v-icon> -->
@@ -53,24 +105,38 @@
 import { mapGetters } from "vuex";
 import moment from "moment";
 export default {
-  created() {
-    this.initialize();
-  },
   data() {
     return {
       resultconfirm: false,
       showDialog: false,
       search: "",
       headers: [
-        { text: "ลำดับ", value: "index", sortable: true, width: "2%" },
+        {
+          text: "ลำดับ",
+          value: "index",
+          sortable: true,
+          width: "2%",
+        },
         {
           text: "วันที่",
           align: "start",
-          sortable: true,
+          sortable: false,
           value: "datecurrent",
-          width: "90%"
+          width: "10%",
         },
-        { text: "Actions", value: "actions", sortable: false, width: "8%" }
+        {
+          text: "แผนก",
+          align: "start",
+          sortable: false,
+          value: "divisionname",
+          width: "20%",
+        },
+        {
+          text: "Actions",
+          value: "actions",
+          sortable: false,
+          width: "8%",
+        },
       ],
       editedIndex: -1,
       kpimainedit: {
@@ -79,39 +145,85 @@ export default {
         create_date: "",
         create_by: "",
         update_date: "",
-        update_by: ""
+        update_by: "",
       },
-      divisionFilterValue: null
+      divisionFilterValue: null,
     };
+  },
+  created() {
+    this.initialize();
   },
   computed: {
     ...mapGetters({
       listkpimain: "kpimain/listkpimainalls",
-      resultdialog: "ui/resultdialog"
-    })
+      resultdialog: "ui/resultdialog",
+      listdivision: "tpm/listdivisions",
+    }),
+    itemsWithIndex() {
+      return this.listkpimain.map((items, index) => ({
+        ...items,
+        index: index + 1,
+      }));
+    },
   },
   props: ["tab_index"],
   watch: {
     //ดูการเปลี่ยนค่าแล้ว
     resultdialog() {
       this.confirmdelete(this.resultdialog);
-    }
+    },
   },
   methods: {
-    getConvertDate: function(date) {
-      if (date) {
-        return moment(date).format("YYYY-MM-DD");
-      }
+    ondivision_status: function() {
+      let status = true;
+      this.divisionFilterValue = null;
+      this.$store.dispatch("kpimain/listkpimainalldivisionstatus", status);
     },
-    divisionFilter(value) {
+    ondivision_statusall: function() {
+      let status = true;
+      this.divisionFilterValue = null;
+      this.$store.dispatch("kpimain/listkpimainalldivisionstatusall", status);
+    },
+    itemRowBackground: function(item) {
+      let num = item.index % 2;
+      return num === 1
+        ? "cyan lighten-5 !important;"
+        : "cyan lighten-4 !important;";
+    },
+    divisionFilter() {
       // If this filter has no value we just skip the entire filter.
+
+      this.divisionFilterValue != 0
+        ? this.$store
+            .dispatch(
+              "kpimain/listkpimainalldivision",
+              this.divisionFilterValue
+            )
+            .catch((error) => {
+              this.$store.dispatch(
+                "snackbar/setSnackbar",
+                {
+                  color: "error",
+                  showing: true,
+                  timeout: 1000,
+                  text: `ไม่พบข้อมูล  ${error.response.status}`,
+                },
+                { root: true }
+              );
+            })
+        : this.$store.dispatch("kpimain/listkpimainall");
+
       if (!this.divisionFilterValue) {
         return true;
       }
-
       // Check if the current loop value (The calories value)
       // equals to the selected value at the <v-select>.
-      return value === this.divisionFilterValue;
+      return this.divisionFilterValue;
+    },
+    getConvertDate: function(date) {
+      if (date) {
+        return moment(date).format("DD-MM-YYYY");
+      }
     },
     Getdivision() {
       console.log(this.divisionType);
@@ -120,7 +232,9 @@ export default {
       this.$emit("changetabindex", tab);
     },
     initialize() {
-      this.$store.dispatch("kpimain/listkpimainall");
+      this.$store.dispatch("kpimain/listkpimainfristpage").then((res) => {
+        this.$store.dispatch("tpm/listdivision");
+      });
     },
     editItem(item) {
       // go to updateform customer (tabindex=3)
@@ -165,9 +279,51 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       });
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style></style>
+<style scoped>
+@media screen and (max-width: 320) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 480) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 600) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 768px) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+.btn {
+  margin-left: 4px;
+  margin-top: 4px;
+}
+.right {
+  float: right;
+}
+.ontop {
+  margin-top: 6px;
+}
+.v-data-table >>> .v-data-table-header span {
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+}
+.v-data-table >>> .v-data-table-header {
+  background-color: #212121;
+}
+.v-data-table >>> tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+</style>

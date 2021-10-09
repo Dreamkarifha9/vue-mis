@@ -1,68 +1,119 @@
 <template>
-<v-card flat class="mx-auto" max-width="auto">
-  <v-card-title>
-    <v-flex xs12 md4>
-      <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details></v-text-field>
-    </v-flex>
-  </v-card-title>
+  <v-card flat class="mx-auto" max-width="auto">
+    <v-card-title>
+      <v-flex xs12 md3 ml-2>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="Search"
+          outlined
+          single-line
+          hide-details
+        ></v-text-field>
+      </v-flex>
+      <v-flex xs12 md4 ml-3>
+        <!-- <v-chip class="ma-2" color="red" outlined>
+          <v-icon left>
+            grade
+          </v-icon>
+          {{ machine.namethai }}
+        </v-chip> -->
 
-  <v-container>
-    <v-form>
-      <v-row>
-        <v-flex xs12 md12>
-          <v-data-table :headers="headers" :items="listmachinedetails" sort-by="orders" :search="search" item-key="id" class="elevation-" loading loading-text="Loading... Please wait">
-            <template v-slot:[`item.actions`]="{ item }">
-              <v-icon medium class="mr-2" color="primary" @click="editItem(item)">
-                mdi-pencil
-              </v-icon>
-              <v-icon medium class="mr-2" color="error" @click="deleteItem(item)">
-                mdi-delete
-              </v-icon>
-            </template>
-          </v-data-table>
-        </v-flex>
-        <v-flex xs12 md12>
-          <v-container fill-height fluid>
-            <v-card primary-title class="justify-center text-center">
-              <v-window v-model="onboarding" reverse>
-                <v-window-item v-for="n in length" :key="`card-${n}`">
-                  <v-img lazy-src="https://picsum.photos/id/11/10/6" class="white--text align-end" max-width="1400" max-height="850" :src="image">
-                    <v-card-title>รายละเอียดรูป</v-card-title>
-                  </v-img>
-                </v-window-item>
-              </v-window>
+        <v-chip large color="grey darken-4" label text-color="white">
+          <v-icon left>
+            mdi-label
+          </v-icon>
+          {{ `${machine.namethai}/${machine.idmachine}` }}
+        </v-chip>
+      </v-flex>
+    </v-card-title>
 
-              <v-card-actions class="justify-space-between ">
-                <v-btn text @click="prev">
-                  <v-icon>mdi-chevron-left</v-icon>
-                </v-btn>
-                <v-item-group v-model="onboarding" class="text-center" mandatory>
-                  <v-item v-for="n in length" :key="`btn-${n}`" v-slot:default="{ active, toggle }">
-                    <v-btn :input-value="active" icon @click="toggle">
-                      <v-icon>mdi-record</v-icon>
+    <v-container>
+      <v-form>
+        <v-row>
+          <v-flex xs12 md12>
+            <v-data-table
+              dense
+              :headers="headers"
+              :items="listmachinedetails"
+              :items-per-page="15"
+              sort-by="orders"
+              :search="search"
+              item-key="id"
+              class="elevation-1"
+            >
+              <template v-slot:[`item.actions`]="{ item }">
+                <v-tooltip top color="black">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-if="$can('view_editmachinetpm')"
+                      elevation="2"
+                      fab
+                      class="teal mr-2 my-1"
+                      x-small
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="editItem(item)"
+                    >
+                      <v-icon color="grey lighten-5">
+                        mdi-pencil
+                      </v-icon>
                     </v-btn>
-                  </v-item>
-                </v-item-group>
-                <v-btn text @click="next">
-                  <v-icon>mdi-chevron-right</v-icon>
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-container>
-        </v-flex>
-      </v-row>
-    </v-form>
-  </v-container>
-</v-card>
+                  </template>
+                  <span>แก้ไข</span>
+                </v-tooltip>
+
+                <v-tooltip top color="black">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                      v-if="$can('view_deletemachinetpm')"
+                      elevation="2"
+                      fab
+                      class="white mr-2 my-1"
+                      x-small
+                      dark
+                      v-bind="attrs"
+                      v-on="on"
+                      @click="deleteItem(item)"
+                    >
+                      <v-icon color="red">
+                        mdi-delete
+                      </v-icon>
+                    </v-btn>
+                  </template>
+                  <span>ลบ</span>
+                </v-tooltip>
+              </template>
+            </v-data-table>
+          </v-flex>
+
+          <v-flex xs12 md12>
+            <v-container fill-height fluid>
+              <v-card primary-title class="justify-center text-center">
+                <v-window v-model="onboarding" reverse>
+                  <v-window-item v-for="n in length" :key="`card-${n}`">
+                    <viewer :images="images" class="images clearfix">
+                      <img :src="images[index]" class="image" />
+                    </viewer>
+                  </v-window-item>
+                </v-window>
+              </v-card>
+            </v-container>
+          </v-flex>
+        </v-row>
+      </v-form>
+    </v-container>
+  </v-card>
 </template>
 
 <script>
-import {
-  mapGetters,
-  mapState
-} from "vuex";
+import { mapGetters, mapState } from "vuex";
 export default {
+  props: ["machine"],
   data: () => ({
+    images: [],
+    index: 0,
     length: 0,
     onboarding: 0,
     active_tab: 0,
@@ -70,45 +121,50 @@ export default {
     search: "",
     // urldefualt: "http://192.168.14.22:8000/",
     urldefualt: process.env.VUE_APP_URL,
-    headers: [{
+    headers: [
+      {
         text: "ลำดับ",
         value: "orders",
-        sortable: true,
+        sortable: false,
         width: "2%",
-        align: "center"
+        align: "center",
       },
       {
         text: "รายการ",
         value: "name",
-        sortable: false
+        width: "30%",
+        align: "left",
+        sortable: false,
       },
       {
         text: "จำนวน",
         value: "number",
         sortable: false,
         width: "2%",
-        align: "center"
+        align: "center",
       },
       {
         text: "หน่วย",
         value: "unit",
         sortable: false,
         width: "2%",
-        align: "center"
+        align: "center",
       },
       {
         text: "รหัสสินค้า",
         value: "idproduct",
+        width: "10%",
+
         sortable: false,
-        align: "center"
+        align: "center",
       },
       {
         text: "Actions",
         value: "actions",
         sortable: false,
         width: "8%",
-        align: "center"
-      }
+        align: "center",
+      },
     ],
     machinedetail: {
       id: "",
@@ -124,8 +180,8 @@ export default {
       y2: "",
       y3: "",
       oh: "",
-      number: ""
-    }
+      number: "",
+    },
   }),
   watch: {
     listimage() {
@@ -136,33 +192,44 @@ export default {
     },
     onboarding(val) {
       //รับค่ามาค้นหาใน arrayimage เพื่อที่จะเอาbase64 ไปใช้ต่อ
-      var newarray = this.listimage.filter(el => {
+      var newarray = this.listimage.filter((el) => {
         return el.index == val;
       });
+      this.index = val;
       // console.log("arraytest  " + newarray[0].id);
-      this.image = "";
-      this.image = `${this.urldefualt}api/images/`.concat(
-        this.listimage[val].pathimage
-      );
-    }
+      // this.image = "";
+      // this.image = `${this.urldefualt}api/images/`.concat(
+      //   this.listimage[val].pathimage
+      // );
+    },
   },
   computed: {
     ...mapGetters({
       listmachinedetails: "tpm/listmachinedetailsall",
       listimage: "tpm/listimages",
       resultdialog: "ui/resultdialog",
-      activetab: "ui/resultactive"
-    })
+      activetab: "ui/resultactive",
+    }),
   },
   mounted() {
     if (this.listimage.length != 0) {
       this.image = `${this.urldefualt}api/images/`.concat(
         this.listimage[0].pathimage
       );
+      this.images.push(
+        `${this.urldefualt}api/images/`.concat(this.listimage[0].pathimage)
+      );
+      console.log("this.images", this.images);
       this.length = this.listimage.length;
     }
   },
   methods: {
+    itemRowBackground: function(item) {
+      let num = item.index % 2;
+      return num === 1
+        ? "cyan lighten-5 !important;"
+        : "cyan lighten-4 !important;";
+    },
     next() {
       this.onboarding =
         this.onboarding + 1 === this.length ? 0 : this.onboarding + 1;
@@ -183,7 +250,7 @@ export default {
         display: true,
         text: "คุณต้องการลบข้อมูลใช่หรือไม่ ?",
         header: "แจ้งเตือน",
-        class: "confirm"
+        class: "confirm",
       });
       this.$store.commit("ui/set_activetab", "tatabledetails");
     },
@@ -193,40 +260,91 @@ export default {
           // ลบข้อมูลทั่วไป
           this.$store
             .dispatch("tpm/deletedetailsmachine", this.machinedetail)
-            .then(res => {
+            .then((res) => {
               this.$store.dispatch(
                 "tpm/listmachinedetails",
                 this.machinedetail.idmachine
               );
               this.$store.dispatch(
-                "snackbar/setSnackbar", {
+                "snackbar/setSnackbar",
+                {
                   color: "info",
                   showing: true,
                   timeout: 2000,
-                  text: "ลบข้อมูลสำเร็จ !!"
-                }, {
-                  root: true
+                  text: "ลบข้อมูลสำเร็จ !!",
+                },
+                {
+                  root: true,
                 }
               );
             })
-            .catch(error => {
+            .catch((error) => {
               this.$store.dispatch(
-                "snackbar/setSnackbar", {
+                "snackbar/setSnackbar",
+                {
                   color: "error",
                   showing: true,
                   timeout: 3000,
-                  text: error
-                }, {
-                  root: true
+                  text: error,
+                },
+                {
+                  root: true,
                 }
               );
               this.error = true;
             });
         }
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
-<style></style>
+<style scoped>
+.image {
+  width: 300px;
+  height: 400px;
+  cursor: pointer;
+  margin: 5px;
+  display: inline-block;
+}
+
+@media screen and (max-width: 320) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 480) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 600) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+@media screen and (max-width: 768px) {
+  .v-data-table >>> .v-data-table__mobile-table-row {
+    display: block;
+  }
+}
+
+.v-data-table >>> span {
+  font-size: 1rem;
+  font-weight: bold;
+  color: white;
+}
+
+.v-text-field >>> label {
+  font-size: 1em;
+  font-weight: bold;
+  color: black;
+}
+.v-data-table >>> .v-data-table-header {
+  background-color: #3d3333;
+}
+.v-data-table >>> tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+</style>

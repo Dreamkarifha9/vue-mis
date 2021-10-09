@@ -16,9 +16,17 @@ export default {
     listimagehistory: [],
     listimageseason1: [],
     listimageseason2: [],
-    statussave: null
+    statussave: null,
+    listjson: [],
+    listmachinegroupid: []
   },
   mutations: {
+    SET_LIST_MACHINEGROUPID (state, machinegroup) {
+      state.listmachinegroupid = machinegroup
+    },
+    SET_LIST_JSON (state, json_b) {
+      state.listjson = json_b;
+    },
     SET_STATUS_SAVE(state, status) {
       state.statussave = status;
     },
@@ -27,6 +35,10 @@ export default {
     },
     SET_LIST_MACCHINEDETIALS(state, machine) {
       state.listmachinedetails = machine;
+    },
+    
+    SET_CLEARLIST_MACCHINEDETIALS(state) {
+      state.listmachinedetails = [];
     },
     SET_LIST_SIZENAME(state, sizename) {
       state.listsizename = sizename;
@@ -79,6 +91,28 @@ export default {
     }
   },
   actions: {
+    async listmachinegroupbyid ({ commit, dispatch }, id) {
+      await axios
+      .get(`/api/machinefinbyid/${id}`)
+        .then(({ data }) => {
+        console.log('data', data)
+        commit("SET_LIST_MACHINEGROUPID", data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    },
+    async listjsontest({ commit, dispatch }) {
+      // const userId = localStorage.getItem("userId");
+      await axios
+        .get(`/api/getjsonb`)
+        .then(({ data }) => {
+          commit("SET_LIST_JSON", data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     async createimghistory({ commit, dispatch }, upimages) {
       return new Promise((resolve, reject) => {
         axios
@@ -224,6 +258,7 @@ export default {
         axios
           .put("/api/updatemachine/" + machine.idmachine, postData)
           .then(({ status }) => {
+            console.log('status', status)
             if (status === 200) {
               resolve({ status });
             }
@@ -265,16 +300,37 @@ export default {
           });
       });
     },
-    async listmachine({ commit, dispatch }) {
+    async listmachineFristpage({ commit, dispatch }) {
       // const userId = localStorage.getItem("userId");
       await axios
-        .get("/api/machineall")
+        .get("/api/machineFristpage")
         .then(({ data }) => {
           commit("SET_LIST_MACCHINE", data);
         })
         .catch(error => {
           console.log(error);
         });
+    },
+    async listmachineAll({ commit, dispatch }) {
+      // const userId = localStorage.getItem("userId");
+      await axios
+        .get("/api/machine")
+        .then(({ data }) => {
+          commit("SET_LIST_MACCHINE", data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
+    async listdivisionallbyid ({ commit, dispatch },iddivision) {
+      await axios
+      .get("/api/machinedivisionidall/" + iddivision)
+      .then(({ data }) => {
+        commit("SET_LIST_MACCHINE", data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
     },
     async listmachinedetails({ commit, dispatch }, machine) {
       // const userId = localStorage.getItem("userId");
@@ -284,6 +340,24 @@ export default {
           commit("SET_LIST_MACCHINEDETIALS", data);
         })
         .catch(error => {
+          commit("SET_CLEARLIST_MACCHINEDETIALS")
+          console.log(error);
+        });
+    },
+    async listmachinedetailbyid({ commit, dispatch }, machineinput) {
+      // const userId = localStorage.getItem("userId");
+      const machine = {
+        listmachine:machineinput
+      }
+      console.log('machine',machine)
+      await axios
+        .post("/api/machinedetailsallbyid" , machine)
+        .then(({ data }) => {
+          commit("SET_LIST_MACCHINEDETIALS", data);
+        })
+        .catch(error => {
+          commit("SET_CLEARLIST_MACCHINEDETIALS")
+          
           console.log(error);
         });
     },
@@ -320,6 +394,17 @@ export default {
           console.log(error);
         });
     },
+    async listmachinfinbyid({ commit, dispatch }, machineid) {
+      // const userId = localStorage.getItem("userId");
+      await axios
+        .get(`/api/machinefinbyid/${machineid}`)
+        .then(({ data }) => {
+          commit("SET_LIST_MACCHINE", data);
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    },
     async listdivision({ commit, dispatch }) {
       // const userId = localStorage.getItem("userId");
       await axios
@@ -333,14 +418,19 @@ export default {
     },
     async listseason({ commit, dispatch }) {
       // const userId = localStorage.getItem("userId");
-      await axios
-        .get("/api/season")
+      return new Promise((resolve, reject) => {
+         axios
+        .get("api/season")
         .then(({ data }) => {
           commit("SET_LIST_SEASON", data);
+          resolve(data)
         })
         .catch(error => {
           console.log(error);
+          reject(error)
         });
+      });
+   
     },
     async getimages({ commit, dispatch }, idmachine) {
       // const userId = localStorage.getItem("userId");
@@ -350,6 +440,7 @@ export default {
           commit("SET_LIST_IMAGES", data);
         })
         .catch(error => {
+
           commit("SET_CLEAR_IMAGE");
         });
     },
@@ -403,7 +494,9 @@ export default {
           });
       });
     },
-    async deleteimages({ commit, dispatch }, machine) {
+    async deleteimages ({ commit, dispatch }, machine) {
+      
+      console.log('machine',machine)
       return new Promise((resolve, reject) => {
         axios
           .delete("/api/delectimages/" + machine)
@@ -457,6 +550,7 @@ export default {
     listseasons: state => state.listseason,
     listimagesplans: state => state.listimageplan,
     listimageshistorys: state => state.listimagehistory,
+    listmachinegroupbyid: state => state.listmachinegroupid,
     listplanseason1: state => {
       let arrimg = state.listimageplan.filter(item => {
         return item.seasonid == 1;
@@ -468,6 +562,7 @@ export default {
         return item.seasonid == 2;
       });
       return arrimg;
-    }
+    },
+    listjsons: state => state.listjson
   }
 };

@@ -137,7 +137,7 @@ export default {
       return value === this.divisionFilterValue;
     },
     Getdivision() {
-      console.log(this.divisionType);
+   
     },
     onchangetabCreate(tab) {
       this.$emit("changetabindex", tab);
@@ -150,7 +150,7 @@ export default {
     editItem(item) {
       // go to updateform customer (tabindex=3)
       this.$emit("changetabindex", 3);
-      console.log(item);
+
       this.editedIndex = this.listmachine.indexOf(item);
       this.editmachine = Object.assign({}, item);
       this.$emit("receivedata", this.editmachine);
@@ -167,7 +167,7 @@ export default {
       this.$emit("receivedata", this.editmachine);
     },
     deleteItem(item) {
-      console.log(this.listmachine.indexOf(item));
+
       this.editedIndex = this.listmachine.indexOf(item);
       this.editmachine = Object.assign({}, item);
 

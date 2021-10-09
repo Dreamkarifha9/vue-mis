@@ -10,7 +10,6 @@
           ref="idmachine"
           v-model="machinedetails.idmachine"
           label="รหัสเครื่องจักร"
-          prepend-icon="mdi mdi-pencil"
           outlined
           disabled
         ></v-text-field>
@@ -20,7 +19,6 @@
           ref="orders"
           v-model="machinedetails.orders"
           label="Orders"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -29,7 +27,6 @@
           ref="name"
           v-model="machinedetails.name"
           label="ชื่อ"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -42,7 +39,7 @@
               v-model="sizemachine"
               :rules="[() => !!sizemachine || '*']"
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
+              
               outlined
             ></v-autocomplete>
           </v-col> -->
@@ -51,7 +48,6 @@
           ref="unit"
           v-model="machinedetails.unit"
           label="Unit"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -60,7 +56,6 @@
           ref="idproduct"
           v-model="machinedetails.idproduct"
           label="Idproduct"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -69,7 +64,6 @@
           ref="w3"
           v-model="machinedetails.w3"
           label="W3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -78,7 +72,6 @@
           ref="m1"
           v-model="machinedetails.m1"
           label="M1"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -87,7 +80,6 @@
           ref="m3"
           v-model="machinedetails.m3"
           label="M3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -96,7 +88,6 @@
           ref="y1"
           v-model="machinedetails.y1"
           label="Y1"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -105,7 +96,6 @@
           ref="y2"
           v-model="machinedetails.y2"
           label="Y2"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -114,7 +104,6 @@
           ref="y3"
           v-model="machinedetails.y3"
           label="Y3"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -123,7 +112,6 @@
           ref="oh"
           v-model="machinedetails.oh"
           label="Oh"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
@@ -132,14 +120,13 @@
           ref="number"
           v-model="machinedetails.number"
           label="Number"
-          prepend-icon="mdi mdi-pencil"
           outlined
         ></v-text-field>
       </v-col>
       <v-col cols="12" sm="4"> </v-col>
     </v-row>
     <v-btn
-      class="ma-2"
+      class="ma-2 green accent-4"
       :loading="loading"
       :disabled="!formHasErrorsdetails"
       color="success"
@@ -153,6 +140,7 @@
 
 <script>
 export default {
+  props: ["tab_index", "machine", "machinedetails"],
   data: () => ({
     loading: false,
     formHasErrorsdetails: true,
@@ -170,19 +158,18 @@ export default {
       y2: "",
       y3: "",
       oh: "",
-      number: ""
-    }
+      number: "",
+    },
   }),
-  props: ["tab_index", "machine", "machinedetails"],
   computed: {
     form2() {
       // comment  >> ใช้ return ค่าให้กับ method customerHandlersubmit
       return {
         idmachine: this.machinedetails.idmachine,
         name: this.machinedetails.name,
-        orders: this.machinedetails.orders
+        orders: this.machinedetails.orders,
       };
-    }
+    },
   },
   methods: {
     async MachineupdateHandlerSubmit() {
@@ -200,60 +187,52 @@ export default {
         y2: this.machinedetails.y2,
         y3: this.machinedetails.y3,
         oh: this.machinedetails.oh,
-        number: this.machinedetails.number
+        number: this.machinedetails.number,
       };
-      this.formHasErrorsdetails = false;
-      Object.keys(this.form2).forEach(f => {
-        if (!this.form2[f]) this.formHasErrorsdetails = true;
-        this.$refs[f].validate(true);
-      });
-      //ถ้าไม่มี error ให้ กด ส่งข้อมูล
-      if (!this.formHasErrorsdetails) {
-        // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
-        this.$store
-          .dispatch("tpm/updatemachinedetails", formData)
-          .then(res => {
-            // this.$store.dispatch("customer/listcustomer");
-            this.$store.dispatch(
-              "snackbar/setSnackbar",
-              {
-                color: "info",
-                showing: true,
-                timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
-              },
-              { root: true }
-            );
-            // clear element
-            // Object.keys(this.form).forEach(f => {
-            //   this.$refs[f].reset();
-            // });
-            this.$store.dispatch(
-              "tpm/listmachinedetails",
-              this.machinedetails.idmachine
-            );
-            this.$refs.form2.reset();
-            this.$refs.form2.resetValidation();
-            this.formHasErrorsdetails = true;
-            this.$emit("onsavedetail_receive");
-          })
-          .catch(error => {
-            this.$store.dispatch(
-              "snackbar/setSnackbar",
-              {
-                color: "error",
-                showing: true,
-                timeout: 3000,
-                text: error
-              },
-              { root: true }
-            );
+      // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
+      this.$store
+        .dispatch("tpm/updatemachinedetails", formData)
+        .then((res) => {
+          // this.$store.dispatch("customer/listcustomer");
+          this.$store.dispatch(
+            "snackbar/setSnackbar",
+            {
+              color: "info",
+              showing: true,
+              timeout: 2000,
+              text: "บันทึกข้อมูลสำเร็จ !!",
+            },
+            { root: true }
+          );
+          // clear element
+          // Object.keys(this.form).forEach(f => {
+          //   this.$refs[f].reset();
+          // });
+          this.$store.dispatch(
+            "tpm/listmachinedetails",
+            this.machinedetails.idmachine
+          );
+          this.$refs.form2.reset();
+          this.$refs.form2.resetValidation();
+          this.formHasErrorsdetails = true;
+          this.$emit("onsavedetail_receive");
+        })
+        .catch((error) => {
+          this.$store.dispatch(
+            "snackbar/setSnackbar",
+            {
+              color: "error",
+              showing: true,
+              timeout: 3000,
+              text: error,
+            },
+            { root: true }
+          );
 
-            this.error = true;
-          });
-      }
-    }
-  }
+          this.error = true;
+        });
+    },
+  },
 };
 </script>
 

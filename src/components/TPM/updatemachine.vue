@@ -20,7 +20,6 @@
               ref="idmachine"
               v-model="machine.idmachine"
               label="รหัสเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
               disabled
@@ -33,7 +32,6 @@
               :rules="[() => !!machine.namethai || '*']"
               :error-messages="errorMessages"
               label="ชื่อเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -45,7 +43,6 @@
               :rules="[() => !!machine.nameeng || '*']"
               :error-messages="errorMessages"
               label="ชื่อภาษาอังกฤษ"
-              prepend-icon="mdi mdi-pencil"
               required
               outlined
             ></v-text-field>
@@ -59,7 +56,7 @@
               v-model="sizemachine"
               :rules="[() => !!sizemachine || '*']"
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
+              
               outlined
             ></v-autocomplete>
           </v-col> -->
@@ -68,13 +65,12 @@
               ref="sizemachine"
               v-model="defualtsize"
               :items="listsizename"
-              :item-text="item => `${item.sizename}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.sizename}`"
+              :item-value="(item) => `${item.id}`"
               return-object
-              @input="sizechange"
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               outlined
+              @input="sizechange"
             >
             </v-autocomplete>
           </v-col>
@@ -83,27 +79,25 @@
               ref="capacity"
               v-model="defualtcapacity"
               :items="listcapacityname"
-              :item-text="item => `${item.capacityname}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.capacityname}`"
+              :item-value="(item) => `${item.id}`"
               return-object
-              @input="capacitychange"
               label="capacity"
-              prepend-icon="mdi mdi-pencil"
               outlined
+              @input="capacitychange"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" sm="12" md="4">
             <v-autocomplete
               ref="power"
               :items="listpowername"
-              :item-text="item => `${item.powername}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.powername}`"
+              :item-value="(item) => `${item.id}`"
               :value="defualtpower"
-              @input="powerchange"
               return-object
               label="Power"
-              prepend-icon="mdi mdi-pencil"
               outlined
+              @input="powerchange"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" sm="12" md="4">
@@ -111,13 +105,12 @@
               ref="division"
               v-model="defualtdivision"
               :items="listdivision"
-              :item-text="item => `${item.divisionname}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.divisionname}`"
+              :item-value="(item) => `${item.id}`"
               return-object
-              @input="divisionchange"
               label="แผนก"
-              prepend-icon="mdi mdi-pencil"
               outlined
+              @input="divisionchange"
             ></v-autocomplete>
           </v-col>
           <v-col cols="12" sm="12" md="4">
@@ -125,7 +118,6 @@
               ref="point"
               v-model="machine.point"
               label="Point"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -134,7 +126,6 @@
               ref="model"
               v-model="machine.model"
               label="Model"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -143,7 +134,6 @@
               ref="nummachine"
               v-model="machine.nummachine"
               label="Nummachine"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -152,7 +142,6 @@
               ref="usejob"
               v-model="machine.usejob"
               label="Usejob"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -161,7 +150,6 @@
               ref="capability"
               v-model="machine.capability"
               label="Capability"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -170,7 +158,6 @@
               ref="manufacturer"
               v-model="machine.manufacturer"
               label="manufacturer"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -179,7 +166,6 @@
               ref="machineineinclude"
               v-model="machine.machineineinclude"
               label="Machineineinclude"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -188,7 +174,6 @@
               ref="genration"
               v-model="machine.genration"
               label="Genration"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
@@ -197,14 +182,13 @@
               ref="energy"
               v-model="machine.energy"
               label="Energy"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-text-field>
           </v-col>
         </v-row>
 
         <v-btn
-          class="ma-2"
+          class="ma-2 green accent-4"
           :loading="loading"
           :disabled="!formHasErrors"
           color="success"
@@ -213,7 +197,11 @@
           <v-icon>mdi mdi-content-save</v-icon>
           บันทึกข้อมูล
         </v-btn>
-        <v-btn class="ma-2" color="error" v-on:click="onChange_tabIndex">
+        <v-btn
+          class="ma-2 red accent-4"
+          color="error"
+          @click="onChange_tabIndex"
+        >
           <v-icon>mdi mdi-undo</v-icon>
           กลับ
         </v-btn>
@@ -225,6 +213,7 @@
 <script>
 import { mapGetters } from "vuex";
 export default {
+  props: ["tab_index", "machine", "images"],
   data: () => ({
     items: ["นาย", "นาง", "นางสาว"],
     formHasErrors: true,
@@ -236,17 +225,16 @@ export default {
     defualtpowerdata: "",
     defualtdivisiondata: "",
     machineRules: [
-      v => !!v || "*",
-      v => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร"
-    ]
+      (v) => !!v || "*",
+      (v) => (v && v.length >= 6) || "กรุณากรอกรหัสเครื่องจักร",
+    ],
   }),
-  props: ["tab_index", "machine", "images"],
   computed: {
     ...mapGetters({
       listsizename: "tpm/listsizenames",
       listcapacityname: "tpm/listcapacitynames",
       listpowername: "tpm/listpowernames",
-      listdivision: "tpm/listdivisions"
+      listdivision: "tpm/listdivisions",
     }),
     defualtsize: {
       get() {
@@ -256,7 +244,7 @@ export default {
       },
       set(newVlue) {
         return newVlue.id;
-      }
+      },
     },
     defualtcapacity: {
       get() {
@@ -266,7 +254,7 @@ export default {
       },
       set(newVlue) {
         return newVlue.id;
-      }
+      },
     },
     defualtdivision: {
       get() {
@@ -276,7 +264,7 @@ export default {
       },
       set(newVlue) {
         return newVlue.id;
-      }
+      },
     },
     defualtpower() {
       return `${this.machine.power}`;
@@ -286,9 +274,9 @@ export default {
       return {
         idmachine: this.machine.idmachine,
         namethai: this.machine.namethai,
-        nameeng: this.machine.nameeng
+        nameeng: this.machine.nameeng,
       };
-    }
+    },
   },
   watch: {
     loader() {
@@ -298,13 +286,11 @@ export default {
       setTimeout(() => (this[l] = false), 3000);
 
       this.loader = null;
-    }
+    },
   },
   methods: {
     async sizechange(value) {
-      console.log(value);
       if (typeof value.id !== "undefined" && value.id !== null) {
-        console.log("defualtsize" + value.id);
         this.defualtsizedata = value.id;
       } else {
         this.defualtsizedata = value.id;
@@ -335,9 +321,6 @@ export default {
       this.$emit("changetabindex", 1);
     },
     async MachineHandlerSubmit() {
-      console.log(this.defualtsizedata);
-      console.log(this.machine.sizemachine);
-
       const formData = {
         idmachine: this.machine.idmachine,
         namethai: this.machine.namethai,
@@ -366,13 +349,12 @@ export default {
         manufacturer: this.machine.manufacturer,
         machineineinclude: this.machine.machineineinclude,
         genration: this.machine.genration,
-        energy: this.machine.energy
+        energy: this.machine.energy,
       };
-      console.log(formData);
+
       this.formHasErrors = false;
-      Object.keys(this.form).forEach(f => {
+      Object.keys(this.form).forEach((f) => {
         if (!this.form[f]) this.formHasErrors = true;
-        console.log(f);
         this.$refs[f].validate(true);
       });
       //ถ้าไม่มี error ให้ กด ส่งข้อมูล
@@ -380,8 +362,7 @@ export default {
         // dispatch หมายถึงสั่งให้ vuex  action ทำงาน
         this.$store
           .dispatch("tpm/updatemachine", formData)
-          .then(res => {
-            console.log("updatemachine" + res);
+          .then((res) => {
             // this.$store.dispatch("customer/listcustomer");
             this.$store.dispatch(
               "snackbar/setSnackbar",
@@ -389,7 +370,7 @@ export default {
                 color: "info",
                 showing: true,
                 timeout: 2000,
-                text: "บันทึกข้อมูลสำเร็จ !!"
+                text: "บันทึกข้อมูลสำเร็จ !!",
               },
               { root: true }
             );
@@ -399,14 +380,14 @@ export default {
             // });
             this.onChange_tabIndex();
           })
-          .catch(error => {
+          .catch((error) => {
             this.$store.dispatch(
               "snackbar/setSnackbar",
               {
                 color: "error",
                 showing: true,
                 timeout: 3000,
-                text: error
+                text: error,
               },
               { root: true }
             );
@@ -424,8 +405,8 @@ export default {
         return true;
       }
       return false;
-    }
-  }
+    },
+  },
 };
 </script>
 

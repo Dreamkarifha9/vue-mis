@@ -51,6 +51,22 @@ const routes = [
     component: () => import("../views/ThePlan.vue")
   },
   {
+    path: "/Registeract",
+    name: "Registeract",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Registeract.vue")
+  },
+  {
+    path: "/Machineact",
+    name: "Machineact",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Machineact.vue")
+  },
+  {
     path: "/Kpimain",
     name: "Kpimain",
     meta: {
@@ -65,6 +81,86 @@ const routes = [
       requiresAuth: true
     },
     component: () => import("../views/Kpiminor.vue")
+  },
+  {
+    path: "/Dailyreport",
+    name: "Dailyreport",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Dailyreport.vue")
+  },
+  {
+    path: "/MachineActreport",
+    name: "MachineActreport",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/MachineActReport.vue")
+  },
+  {
+    path: "/MachineActreport_Security",
+    name: "MachineActreport_Security",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/MachineActReport_security.vue")
+  },
+  {
+    path: "/test",
+    name: "test",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/testv-images.vue")
+  },
+  {
+    path: "/testpermission",
+    name: "testpermission",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/testpermission.vue")
+  },
+  {
+    path: "/Security",
+    name: "Security",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Managerpermission.vue")
+  },
+  {
+    path: "/Permission",
+    name: "Permission",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Permission.vue")
+  },
+  {
+    path: "/userregister",
+    name: "userregister",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Usermanager.vue")
+  },
+  {
+    path: "/division",
+    name: "division",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/Division.vue")
+  },
+  {
+    path: "/dailogtest",
+    name: "dailogtest",
+    meta: {
+      requiresAuth: true
+    },
+    component: () => import("../views/TestDailog.vue")
   }
 ];
 
@@ -75,6 +171,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!store.getters["user/isAuthenticated"]) {
       next({
@@ -83,7 +180,7 @@ router.beforeEach((to, from, next) => {
     } else {
       next();
     }
-  } else if (to.matched.some(record => record.meta.requiresVisitor)) {
+  } else if (!to.matched.some(record => record.meta.requiresVisitor)) {
     if (store.getters["user/isAuthenticated"]) {
       next({
         name: "home"

@@ -20,4 +20,3 @@ CMD ["nginx", "-g", "daemon off;"]
 # docker save -o d:\KI\Vuejs\miskisugarimages.tar miskisugar
 # docker load -i d:\Inbox\miskisugarimages.tar
 # docker run -itd -p 8081:81 --name miskisugar miskisugar
-

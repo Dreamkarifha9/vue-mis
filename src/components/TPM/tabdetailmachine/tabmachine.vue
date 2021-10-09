@@ -16,11 +16,10 @@
               ref="division"
               v-model="defualtdivision"
               :items="listdivision"
-              :item-text="item => `${item.divisionname}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.divisionname}`"
+              :item-value="(item) => `${item.id}`"
               return-object
               label="แผนก"
-              prepend-icon="mdi mdi-pencil"
               outlined
             ></v-autocomplete>
           </v-col>
@@ -29,7 +28,7 @@
               ref="idmachine"
               v-model="machine.idmachine"
               label="รหัส"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -37,7 +36,7 @@
               ref="prefnamethaiix"
               v-model="machine.namethai"
               label="ชื่อเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -45,7 +44,7 @@
               ref="nameeng"
               v-model="machine.nameeng"
               label="ชื่อภาษาอังกฤษ"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="12" md="6">
@@ -53,7 +52,7 @@
               ref="point"
               v-model="machine.point"
               label="จุดใช้งาน"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="12" md="6">
@@ -61,7 +60,7 @@
               ref="model"
               v-model="machine.model"
               label="แบบ"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -69,7 +68,7 @@
               ref="nummachine"
               v-model="machine.nummachine"
               label="หมายเลขเครื่อง"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="12" md="6">
@@ -77,11 +76,10 @@
               ref="sizemachine"
               v-model="defualtsize"
               :items="listsizename"
-              :item-text="item => `${item.sizename}`"
-              :item-value="item => `${item.id}`"
+              :item-text="(item) => `${item.sizename}`"
+              :item-value="(item) => `${item.id}`"
               return-object
               label="ขนาดเครื่องจักร"
-              prepend-icon="mdi mdi-pencil"
               outlined
             >
             </v-autocomplete>
@@ -91,7 +89,7 @@
               ref="energy"
               v-model="machine.energy"
               label="Energy"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -99,7 +97,7 @@
               ref="usejob"
               v-model="machine.usejob"
               label="ใช้ในงาน"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -107,7 +105,7 @@
               ref="capability"
               v-model="machine.capability"
               label="ขนาดความสามารถ"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -115,7 +113,7 @@
               ref="manufacturer"
               v-model="machine.manufacturer"
               label="ผู้ผลิต"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -123,7 +121,7 @@
               ref="machineineinclude"
               v-model="machine.machineinclude"
               label="เครื่องจักรประกอบด้วย"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
           <v-col cols="12" sm="6">
@@ -131,7 +129,7 @@
               ref="genration"
               v-model="machine.genration"
               label="รุ่น"
-              prepend-icon="mdi mdi-pencil"
+              outlined
             ></v-text-field>
           </v-col>
         </v-row>
@@ -143,18 +141,18 @@
 <script>
 import { mapGetters, mapState } from "vuex";
 export default {
+  props: ["tab_index", "machine", "machinedetails"],
   data: () => ({
     defualtsizedata: "",
     defualtcapacitydata: "",
     defualtpowerdata: "",
-    urldefualt: "http://192.168.14.22:8000/"
+    urldefualt: "http://192.168.14.22:8000/",
   }),
   created() {},
-  props: ["tab_index", "machine", "machinedetails"],
   computed: {
     ...mapGetters({
       listsizename: "tpm/listsizenames",
-      listdivision: "tpm/listdivisions"
+      listdivision: "tpm/listdivisions",
     }),
     defualtsize: {
       get() {
@@ -163,7 +161,7 @@ export default {
       },
       set(newVlue) {
         return newVlue.id;
-      }
+      },
     },
     defualtdivision: {
       get() {
@@ -173,10 +171,16 @@ export default {
       },
       set(newVlue) {
         return newVlue.id;
-      }
-    }
-  }
+      },
+    },
+  },
 };
 </script>
 
-<style></style>
+<style scoped>
+.v-text-field >>> label {
+  font-size: 1em;
+  font-weight: bold;
+  color: black;
+}
+</style>
