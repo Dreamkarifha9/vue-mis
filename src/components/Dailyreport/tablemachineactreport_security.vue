@@ -1289,10 +1289,10 @@ export default {
     },
     async MachineHandlerSubmit() {
       let uuid = this.uuidv4();
-      const username = localStorage.getItem("username");
+      const employeeId = localStorage.getItem("employeeId");
       this.Obj.id = uuid;
       this.Obj.do_date = this.date;
-      this.Obj.update_by = username;
+      this.Obj.update_by = employeeId;
       this.Obj.result_check = this.machinecheck;
       this.Obj.status = "Saved";
       if (this.machinecheck === "R") {
@@ -1304,7 +1304,7 @@ export default {
       console.log("Obj", this.Obj);
 
       await axios
-        .post("http://192.168.2.104:97/machineactresultpost", this.Obj)
+        .post("http://110.164.149.104:97/machineactresultpost", this.Obj)
         .then((res) => {
           console.log("res", res);
           if (res.data.success == true) {
@@ -1358,7 +1358,7 @@ export default {
         this.Obj.idmachine = item.idmachine;
         this.Obj.duratypeid = item.duratypeid;
         // await axios
-        //   .post("http://192.168.2.104:97/machineactresultpost", Obj)
+        //   .post("http://110.164.149.104:97:97/machineactresultpost", Obj)
         //   .then((res) => {})
         //   .catch((err) => {
         //     console.log("err", err);

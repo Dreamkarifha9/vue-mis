@@ -167,6 +167,17 @@ export default {
           },
         ],
       },
+       {
+        action: "mdi-arrange-send-backward",
+        title: "BackActtivity",
+        can: "view_readbackacttivity",
+        items: [
+          {
+            title: "บันทึกกิจกรรมย้อนหลัง",
+            link: "MachineActreport_Security",
+          },
+        ],
+      },
     ],
     username: null,
   }),

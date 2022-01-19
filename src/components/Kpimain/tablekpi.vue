@@ -56,11 +56,13 @@
         dense
         :headers="headers"
         :items="itemsWithIndex"
-        :items-per-page="15"
+        :items-per-page="10000"
         sort-by="index"
         :search="search"
         item-key="id"
-        class="elevation-"
+        group-by="groupdatecurrent"
+        class="elevation-1"
+        show-group-by
       >
         <template v-slot:[`item.datecurrent`]="{ item }">
           {{ getConvertDate(item.datecurrent) }}
@@ -113,26 +115,29 @@ export default {
       headers: [
         {
           text: "ลำดับ",
+           align: "start",
           value: "index",
           sortable: true,
           width: "2%",
+          groupable: false,
         },
         {
           text: "วันที่",
-          align: "start",
+          align: "right",
           sortable: false,
           value: "datecurrent",
           width: "10%",
         },
         {
           text: "แผนก",
-          align: "start",
+          align: "right",
           sortable: false,
           value: "divisionname",
           width: "20%",
         },
         {
           text: "Actions",
+           align: "right",
           value: "actions",
           sortable: false,
           width: "8%",

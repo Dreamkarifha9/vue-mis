@@ -75,7 +75,7 @@ export default {
               localStorage.setItem("refresh_token", data.refreshToken);
               localStorage.setItem("userId", data.data[0].user_id);
               localStorage.setItem("username", data.data[0].username);
-
+              localStorage.setItem("employeeId", data.data[0].employee_id);
               localStorage.setItem("username", data.data[0].name);
 
               localStorage.setItem("expirationDate", expirationDate);
